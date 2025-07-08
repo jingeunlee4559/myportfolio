@@ -57,6 +57,15 @@ const Navs = () => {
       >
         <strong>PROJECT</strong>
       </a>
+            <a
+        href="#board"
+        className={`
+          text-lg font-medium hover:underline transition-colors duration-300
+          ${scrolled ? "text-gray-800 hover:text-blue-600" : "text-white hover:text-blue-200"}
+        `}
+      >
+        <strong>BOARD</strong>
+      </a>
     </nav>
   );
 };

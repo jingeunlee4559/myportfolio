@@ -7,6 +7,7 @@ import Skills from "./pages/Skills";
 import ThankYouScreen from "./pages/ThankYouScreen";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import CommentBoard from "./components/CommentBoard";
 
 function App() {
   useEffect(() => {
@@ -22,6 +23,7 @@ function App() {
       </div>
       <Projects />
       <ThankYouScreen />
+      <CommentBoard/>
     </>
   );
 }

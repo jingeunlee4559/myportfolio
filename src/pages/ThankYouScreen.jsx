@@ -38,6 +38,11 @@ const ThankYouScreen = () => {
       >
         Git Hub
       </a>
+          <div className="mt-10 animate-bounce"
+
+          >
+          <span className="text-3xl text-black">▼</span>
+        </div>
     </div>
   );
 };
