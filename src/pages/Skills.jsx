@@ -13,7 +13,7 @@ import egove from '../assets/skills/egove.png'; // 전자정부프레임워크
 import MySQL from '../assets/skills/MySQL.png';
 import OracleDB from '../assets/skills/Oracle DB.jpg';
 import Github from '../assets/skills/Github.jpg';
-import Slack from '../assets/skills/Slack.png';
+import Slack from '../assets/skills/slack.png';
 import Notion from '../assets/skills/Notion.png';
 import Figma from '../assets/skills/Figma.png';
 import Eclipse from '../assets/skills/Eclipse.jpg';
