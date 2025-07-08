@@ -13,7 +13,7 @@ const ThankYouScreen = () => {
       }}
     >
       {/* "Thank you" 텍스트 - 이 부분은 그대로 두셔도 됩니다. */}
-      <h1 className="text-7xl font-bold mb-4 opacity-80" style={{ fontSize: '10rem' }}>
+      <h1 className="text-4xl font-bold mb-4 opacity-80" style={{ fontSize: '7rem' }}>
         Thank you
       </h1>
 
