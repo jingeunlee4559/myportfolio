@@ -1,30 +1,29 @@
-import './App.css'
-import React, { useEffect } from 'react';
-import About from './pages/About'
-import Home from './pages/Home'
-import Projects from './pages/Projects'
-import Skills from './pages/Skills'
-import ThankYouScreen from './pages/ThankYouScreen'
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import "./App.css";
+import React, { useEffect } from "react";
+import About from "./pages/About";
+import Home from "./pages/Home";
+import Projects from "./pages/Projects";
+import Skills from "./pages/Skills";
+import ThankYouScreen from "./pages/ThankYouScreen";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 function App() {
-
   useEffect(() => {
-  AOS.init({ duration: 1000 });
-}, []);
+    AOS.init({ duration: 1000 });
+  }, []);
 
   return (
     <>
-    <Home/>
-    <About/>
-          <div className="mt-3"> {/* 이 div를 추가하여 간격을 명시적으로 줍니다 */}
+      <Home />
+      <About />
+      <div className="mt-3">
         <Skills />
       </div>
-    <Projects/>
-    <ThankYouScreen/>
+      <Projects />
+      <ThankYouScreen />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

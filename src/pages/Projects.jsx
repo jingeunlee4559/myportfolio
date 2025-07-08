@@ -170,7 +170,7 @@ const projects = [
             urls: { // <--- 이 부분을 각 프로젝트 details에 추가해야 합니다.
         githubURL: 'https://github.com/illhanunjung/ReadFit',
         serviceURL: 'null',
-        blogURL: 'null', // 또는 'https://your-blog-1.com'
+        blogURL: 'null', 
       },
     overview: '온라인 쇼핑몰 신발 리뷰 데이터를 기반으로 인기 신발 랭킹 및 감성 분석 결과를 제공하는 서비스입니다. 저는 이 프로젝트에서 분석된 데이터를 시각화하는 프론트엔드 개발, 백엔드 시스템 구축, 그리고 전체적인 UI/UX 디자인을 담당했습니다.', // Clarified role
     features: [
@@ -199,7 +199,7 @@ const projects = [
   title: '유사도 분석 기반 개인 맞춤형 웨딩플랜 서비스',
   subtitle: '웨딩홀, 스드메 등 맞춤 웨딩플랜 추천',
   tags: ['FE', '디자인', 'BE','웹','팀'],
-  image:  '/project-images/project_wd.png', // Assuming this is a placeholder or generic image path
+  image:  '/project-images/project_wd.png', 
   type: 'generic',
   details: {
     modalTitle: '웨딩플랜 서비스',
@@ -219,10 +219,10 @@ const projects = [
 
 
     ], // No specific images provided, keeping empty
-         urls: { // <--- 이 부분을 각 프로젝트 details에 추가해야 합니다.
+         urls: { 
         githubURL: 'https://github.com/2024-AISCHOOL-APP/In_site',
         serviceURL: 'null',
-        blogURL: 'null', // 또는 'https://your-blog-1.com'
+        blogURL: 'null',
       },
     overview: '광주 지역 결혼 예정자를 위한 웨딩홀, 스드메 등 맞춤 웨딩플랜 추천 및 예약 서비스입니다. 저는 이 프로젝트에서 프론트엔드 개발, 백엔드 시스템 구축 및 FastAPI 연동, 그리고 전체적인 UI/UX 디자인을 담당했습니다.', // Clarified role
     features: [
@@ -246,8 +246,8 @@ const projects = [
 {
   title: 'YOLOv11 기반 실시간 흉기 소지자 알림 서비스',
   subtitle: 'CCTV 영상 분석 기반 실시간 위험 알림',
-  tags: ['FE', 'BE', '디자인', '웹', '앱','팀'], // Added '웹', '앱' to tags
-  image: '/project-images/project_as.png', // Assuming this is a placeholder or generic image path
+  tags: ['FE', 'BE', '디자인', '웹', '앱','팀'], 
+  image: '/project-images/project_as.png',
   type: 'generic',
   details: {
     modalTitle: 'YOLOv11 기반 실시간 흉기 소지자 알림 서비스',
@@ -268,11 +268,11 @@ const projects = [
        '/project-images/project_as9.png',        
        '/project-images/project_as10.png',        
 
-    ], // No specific images provided, keeping empty
-      urls: { // <--- 이 부분을 각 프로젝트 details에 추가해야 합니다.
+    ], 
+      urls: { 
         githubURL: 'https://github.com/Kim-Ji-Man/Ask-Me',
         serviceURL: 'null',
-        blogURL: 'null', // 또는 'https://your-blog-1.com'
+        blogURL: 'null', 
       },
     overview: 'YOLOv11 모델로 CCTV 영상을 실시간 분석, 흉기 소지자 감지 시 관리자/경비원/사용자에게 실시간 알림을 제공하는 서비스입니다. 저는 이 프로젝트에서 웹 및 앱 프론트엔드 개발, 백엔드 시스템 구축, 그리고 전체적인 UI/UX 디자인을 담당했습니다.', // Clarified role
     features: [

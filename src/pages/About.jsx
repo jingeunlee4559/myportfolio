@@ -140,7 +140,7 @@ const About = () => {
                 </li>
                 <li>
                   <span className="font-semibold">
-                    2022 핵심프로젝트 우수상
+                    2022 실전프로젝트 왕중왕전 대상
                   </span>
                 </li>
                 <li>
@@ -148,9 +148,10 @@ const About = () => {
                     2022 실전프로젝트 최우수상
                   </span>
                 </li>
+
                 <li>
                   <span className="font-semibold">
-                    2022 실전프로젝트 왕중왕전 대상
+                    2022 핵심프로젝트 우수상
                   </span>
                 </li>
               </ul>
