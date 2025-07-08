@@ -132,77 +132,66 @@ const Skills = () => {
   return (
 <div
   id="skill"
-  className="min-h-screen w-full flex flex-col items-center justify-center bg-white pt-32 pb-24 px-4 sm:px-6 lg:px-8" // pt-24를 pt-32 또는 pt-48 등으로 변경
+  className="min-h-screen w-full flex flex-col items-center justify-center bg-white pt-32 pb-24 px-4 sm:px-6 lg:px-8"
 >
-      {/* 제목 - SKILLS */}
-      {/* <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
-        <span className="inline-block relative pb-2">
-          SKILLS
-          <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
-        </span>
-      </h2> */}
+  <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
+    <span className="inline-block relative pb-6">
+      SKILLS
+      <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
+    </span>
+  </h2>
 
-         <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
-  <span className="inline-block relative pb-6"> {/* 새로운 span */}
-   SKILLS
-    <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
-  </span>
-</h2>
+  {/* 메인 스킬 컨테이너 */}
+  <div className="w-full max-w-6xl bg-[#f8f9fa] rounded-3xl shadow-2xl flex flex-col md:flex-row items-start gap-8 p-8 md:p-12 mx-auto">
+    {/* 왼쪽 카테고리 버튼 영역 */}
+    <div className="w-full md:w-1/4 md:max-w-[180px] flex flex-row md:flex-col justify-center md:justify-start gap-2 md:gap-4 flex-wrap flex-shrink-0">
+      {Object.keys(skillData).map((category) => (
+        <button
+          key={category}
+          className={`
+            relative px-4 py-2 text-lg font-semibold transition-colors duration-200
+            text-left w-full md:w-auto
+            ${selectedCategory === category
+              ? "text-blue-700 hover:text-blue-700"
+              : "text-gray-700 hover:text-blue-500"}
+          `}
+          onClick={() => setSelectedCategory(category)}
+        >
+          <span className={`
+            absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-full transition-colors duration-200
+            ${selectedCategory === category
+              ? "bg-blue-600"
+              : "bg-transparent"}
+          `}></span>
+          {category}
+        </button>
+      ))}
+    </div>
 
-      {/* 메인 스킬 컨테이너 */}
-      <div className="w-full max-w-6xl bg-[#f8f9fa] rounded-3xl shadow-2xl flex flex-col md:flex-row items-start gap-8 p-8 md:p-12 mx-auto">
-        {/* 왼쪽 카테고리 버튼 영역 */}
-        <div className="w-full md:w-1/4 flex flex-row md:flex-col justify-center md:justify-start gap-2 md:gap-4 flex-wrap">
-          {Object.keys(skillData).map((category) => (
-            <button
-              key={category}
-              className={`
-                relative px-4 py-2 text-lg font-semibold transition-colors duration-200
-                text-left w-full md:w-auto
-                ${selectedCategory === category
-                  ? "text-blue-700 hover:text-blue-700" // 선택된 버튼은 호버해도 색상 유지
-                  : "text-gray-700 hover:text-blue-500"} // 선택되지 않은 버튼은 기본 및 호버 색상 적용
-              `}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {/* 이미지처럼 왼쪽에 세로선을 추가합니다. */}
-              <span className={`
-                absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-full transition-colors duration-200
-                ${selectedCategory === category
-                  ? "bg-blue-600" // 선택된 버튼의 선 색상을 더 진하게 변경
-                  : "bg-transparent"} // 기본 버튼의 선 색상 (투명)
-              `}></span>
-              {category}
-            </button>
+    {/* 오른쪽 스킬 내용 영역 */}
+    <div className="flex-1 w-full md:w-3/4 min-w-[320px] md:min-w-[400px] max-w-full p-4 md:p-6 bg-white rounded-xl shadow-inner">
+      {skillData[selectedCategory] && skillData[selectedCategory].length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {skillData[selectedCategory].map((skill, index) => (
+            <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm">
+              <img
+                src={skill.icon}
+                alt={`${skill.name} 아이콘`}
+                className="w-12 h-12 rounded-lg object-contain"
+              />
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">{skill.name}</h3>
+                <p className="text-gray-600 text-base mt-1">{skill.description}</p>
+              </div>
+            </div>
           ))}
         </div>
-
-        {/* 오른쪽 스킬 내용 영역 */}
-        <div className="flex-1 w-full md:w-3/4 p-4 md:p-6 bg-white rounded-xl shadow-inner">
-          {skillData[selectedCategory] && skillData[selectedCategory].length > 0 ? (
-            <div className="grid grid-cols-1 gap-6">
-              {skillData[selectedCategory].map((skill, index) => (
-                <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm">
-                  {/* 아이콘을 img 태그로 렌더링하고, 임포트된 이미지 변수를 src로 사용합니다. */}
-                  {/* 아이콘 크기 및 스타일을 조정하여 더 예쁘고 정확하게 보이도록 합니다. */}
-                  <img
-                    src={skill.icon}
-                    alt={`${skill.name} 아이콘`}
-                    className="w-12 h-12 rounded-lg object-contain" // 크기 확대, object-contain, 둥근 모서리 조정
-                  />
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">{skill.name}</h3>
-                    <p className="text-gray-600 text-base mt-1">{skill.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-10">선택된 카테고리에 대한 정보가 없습니다.</p>
-          )}
-        </div>
-      </div>
+      ) : (
+        <p className="text-gray-500 text-center py-10">선택된 카테고리에 대한 정보가 없습니다.</p>
+      )}
     </div>
+  </div>
+</div>
   );
 };
 
