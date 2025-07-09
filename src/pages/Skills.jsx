@@ -180,11 +180,12 @@ const Skills = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {skillData[selectedCategory].map((skill, index) => (
             <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm">
-              <img
-                src={skill.icon}
-                alt={`${skill.name} 아이콘`}
-                className="w-12 h-12 rounded-lg object-contain"
-              />
+      <img
+  src={skill.icon}
+  alt={`${skill.name} 아이콘`}
+  className="w-20 h-20 rounded-lg object-contain bg-white shadow"
+  style={{ backgroundColor: "white" }}
+/>
               <div>
                 <h3 className="text-xl font-bold text-gray-800">{skill.name}</h3>
                 <p className="text-gray-600 text-base mt-1">{skill.description}</p>
