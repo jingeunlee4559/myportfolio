@@ -1,6 +1,7 @@
 // Projects.jsx
 import React, { useState } from 'react';
 import ProjectModal from '../components/Projects/ProjectModal'; // 모달 컴포넌트 임포트
+import { FaSearch } from 'react-icons/fa';
 
 // 태그별 스타일 매핑 (기존과 동일)
 const tagColors = {
@@ -305,7 +306,6 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [modalPosition, setModalPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
-  // 카드 클릭 시 마우스 위치 저장
   const openModal = (project, e) => {
     setSelectedProject(project);
     setShowModal(true);
@@ -318,61 +318,67 @@ const Projects = () => {
   };
 
   return (
-    <section  id="project" className="bg-white py-20 px-6 text-center">
-      {/* <h2 className="text-4xl font-bold mb-4">PROJECT</h2>
-      <div className="w-16 h-1 mx-auto bg-blue-500 mb-10" /> */}
-               <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
-  <span className="inline-block relative pb-6"> {/* 새로운 span */}
- PROJECT
-    <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
-  </span>
-</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-     {projects.map((project, index) => {
-  // 짝수 index는 왼쪽(fade-left), 홀수 index는 오른쪽(fade-right)
-  const aosType = index % 2 === 0 ? 'fade-left' : 'fade-right';
+    <section id="project" className="bg-white py-20 px-6 text-center">
+      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
+        <span className="inline-block relative pb-6">
+          PROJECT
+          <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
+        </span>
+      </h2>
 
-  return (
-    <div
-      key={index}
-      className="bg-white rounded-2xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 flex flex-col h-full cursor-pointer"
-      onClick={(e) => openModal(project, e)}
-      data-aos={aosType}
-      data-aos-duration="1000"
-      data-aos-delay={`${(index % 3) * 200}`} // 한 줄씩 약간 딜레이
-    >
-      <img
-        src={project.image}
-        alt={project.title}
-        className="w-full h-48 object-cover"
-      />
-      <div className="bg-blue-50 w-full flex-1 flex flex-col justify-between p-5">
-        <div className="flex flex-wrap gap-2 justify-center mb-3">
-          {project.tags.map((tag, i) => (
-            <span
-              key={i}
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${tagColors[tag] || 'bg-gray-200 text-gray-700'}`}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        {projects.map((project, index) => {
+          const aosType = index % 2 === 0 ? 'fade-left' : 'fade-right';
+
+          return (
+            <div
+              key={index}
+              className="relative group bg-white rounded-2xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 flex flex-col h-full cursor-pointer"
+              onClick={(e) => openModal(project, e)}
+              data-aos={aosType}
+              data-aos-duration="1000"
+              data-aos-delay={`${(index % 3) * 200}`}
             >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div>
-          <h3 className="text-lg font-bold mb-1">{project.title}</h3>
-          <p className="text-sm text-gray-600">{project.subtitle}</p>
-        </div>
+              {/* 이미지 */}
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-48 object-cover"
+              />
+
+              {/* ✅ 오버레이 + 돋보기 아이콘 */}
+<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+  <FaSearch className="text-white text-3xl" />
+</div>
+              {/* 프로젝트 설명 */}
+              <div className="bg-blue-50 w-full flex-1 flex flex-col justify-between p-5">
+                <div className="flex flex-wrap gap-2 justify-center mb-3">
+                  {project.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${tagColors[tag] || 'bg-gray-200 text-gray-700'}`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold mb-1">{project.title}</h3>
+                  <p className="text-sm text-gray-600">{project.subtitle}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </div>
-  );
-})}
-      </div>
-      {/* 클릭 위치 정보와 함께 모달에 전달 */}
+
+      {/* 모달 */}
       <ProjectModal
-  show={showModal}
-  onClose={closeModal}
-  project={{ ...selectedProject, index: projects.indexOf(selectedProject) }}
-  position={modalPosition}
-/>
+        show={showModal}
+        onClose={closeModal}
+        project={{ ...selectedProject, index: projects.indexOf(selectedProject) }}
+        position={modalPosition}
+      />
     </section>
   );
 };
