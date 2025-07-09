@@ -8,6 +8,7 @@ import ThankYouScreen from "./pages/ThankYouScreen";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import CommentBoard from "./components/CommentBoard";
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   useEffect(() => {
@@ -24,6 +25,7 @@ function App() {
       <Projects />
       <ThankYouScreen />
       <CommentBoard/>
+       <Analytics />
     </>
   );
 }
