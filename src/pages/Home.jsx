@@ -4,12 +4,12 @@ import Navs from "../components/Navs";
 
 const Home = () => {
   return (
-    <div
-      className="min-h-screen w-screen flex flex-col bg-cover bg-center bg-no-repeat overflow-x-hidden"
-      style={{
-        backgroundImage: `url(${backImg})`,
-      }}
-    >
+<div
+  className="min-h-screen w-full flex flex-col bg-cover bg-center bg-no-repeat overflow-x-hidden"
+  style={{
+    backgroundImage: `url(${backImg})`,
+  }}
+>
       <Navs />
       <main className="flex flex-1 flex-col items-center justify-center text-center px-4">
         <div className="flex flex-col items-center justify-center"> {/* relative 제거, flex로 대체 */}

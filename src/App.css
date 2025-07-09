@@ -1,18 +1,21 @@
 #root {
-  /* max-width: 1280px; */
+  /* 기존 값 제거 또는 수정 */
   margin: 0 auto;
-  padding: 2rem;
-  /* text-align: center; */ /* 이미 주석 처리 잘 하셨습니다. */
-
-  /* 추가: #root를 플렉스 컨테이너로 만들고 중앙 정렬 */
+  padding: 0; /* ← 여기 padding 제거 또는 최소화 */
   display: flex;
-  flex-direction: column; /* 자식 요소들을 세로로 쌓습니다 (Home, About) */
-  align-items: center;   /* 자식 요소들을 가로축(수평)으로 중앙 정렬합니다. */
+  flex-direction: column;
+  align-items: center;
 }
-html, body, #root {
+
+
+/* html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+} */
+html, body {
+  width: 100%;
+  overflow-x: hidden; 
 }
 
 .logo {
