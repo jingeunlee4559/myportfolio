@@ -2,8 +2,9 @@ import React, { useState } from "react";
 // 사용자님께서 제공해주신 이미지 파일들을 임포트합니다.
 import js from '../assets/skills/js.png';
 import html from '../assets/skills/html.png';
-import java from '../assets/skills/java.png';
-import python from '../assets/skills/python.png';
+import css from '../assets/skills/css.png';
+import java from '../assets/skills/java.webp';
+import python from '../assets/skills/python.webp';
 import react from '../assets/skills/react.png';
 import vite from '../assets/skills/vite.jpg';
 import Bootstrap from '../assets/skills/Bootstrap.jpg';
@@ -33,11 +34,16 @@ const Skills = () => {
         description: "React 기반 웹 애플리케이션 개발에 핵심적으로 활용",
         icon: js,
       },
-      {
-        name: "HTML/CSS",
-        description: "웹 표준 기반 UI/UX 구현 및 반응형 웹 디자인",
-        icon: html,
-      },
+   {
+      name: "HTML",
+      description: "기본적인 HTML 태그를 사용할 수 있습니다.",
+      icon: html,
+    },
+    {
+      name: "CSS",
+      description: "스타일링과 반응형 웹 디자인 구현",
+      icon: css, // 필요 시 별도 CSS 이미지로 교체 가능
+    },
       {
         name: "JAVA",
         description: "Spring 기반 백엔드 시스템 개발",

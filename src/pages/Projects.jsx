@@ -346,7 +346,7 @@ const Projects = () => {
                 className="w-full h-48 object-cover"
               />
 
-              {/* ✅ 오버레이 + 돋보기 아이콘 */}
+              {/*오버레이 + 돋보기 아이콘 */}
 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
   <FaSearch className="text-white text-3xl" />
 </div>
