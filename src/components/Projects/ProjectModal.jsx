@@ -5,6 +5,7 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import { Autoplay } from 'swiper/modules';
 import ProjectHeader from './ProjectHeader';
+import ProjectImageSwiper from './ProjectImageSwiper';
 
 const ProjectModal = ({ show, onClose, project }) => {
   if (!show || !project) return null;
@@ -51,19 +52,7 @@ const ProjectModal = ({ show, onClose, project }) => {
 
           {/* 이미지 슬라이더 */}
           <div className="my-4 rounded-md overflow-hidden shadow-md">
-            <Swiper
-              modules={[Autoplay]}
-              autoplay={{ delay: 2500, disableOnInteraction: false }}
-              loop={true}
-              spaceBetween={10}
-              className="w-full h-[300px]"
-            >
-              {modalImages.map((src, idx) => (
-                <SwiperSlide key={idx}>
-                  <img src={src} alt={`project slide ${idx + 1}`} className="w-full h-[300px] object-contain bg-white" />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+              <ProjectImageSwiper images={modalImages} />
           </div>
 
           {/* 소개 섹션 - Pinned Title: 기본 텍스트 색상 (4번째 프로젝트만 흰색, 나머지는 검정) */}
@@ -90,7 +79,7 @@ const ProjectModal = ({ show, onClose, project }) => {
             <ul className={`list-disc pl-6 space-y-2 text-[13.5px]`}>
               {features.map((feature, idx) => (
                 <li key={idx}>
-                  <span className="font-semibold">{feature.heading}</span> {feature.description}
+                  <span className="font-semibold">{feature.heading}</span> <br></br>{feature.description}
                   {feature.subpoints && (
                     <ul className={`list-disc pl-6 mt-1`}>
                       {feature.subpoints.map((pt, i) => <li key={i}>{pt}</li>)}
