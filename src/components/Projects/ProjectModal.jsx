@@ -93,7 +93,9 @@ const ProjectModal = ({ show, onClose, project }) => {
                 >
                     결과
                 </h3>
-                <div className={`text-[13.5px] whitespace-pre-line list-disc`}>{results}</div>
+                 <div
+    className={`text-[13.5px] whitespace-pre-line bg-white p-4 rounded-md shadow-sm leading-relaxed text-gray-800 border border-gray-200`}
+  >{results}</div>
             </section>
 
             <section className="mb-6">
