@@ -28,30 +28,27 @@ const ProjectModal = ({ show, onClose, project }) => {
   // 강조 배경색 (accentColor)이 검은색일 경우 텍스트 색상을 흰색으로 설정, 아니면 기본값 (없으면 text-black)
   const textColorForAccentBackground = accentColor === '#000000' ? 'text-white' : '';
 
-  const { modalTitle, subtitle, period, members, modalImages, overview, features, results, techStack, urls: URLS } = project.details;
+  const { modalTitle, subtitle, period, members, modalImages, overview, features, results, techStack, urls: URLS,videoURL  } = project.details;
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40`}>
       <div
         className={`relative w-[860px] max-h-[90vh] rounded-xl overflow-hidden shadow-2xl border border-gray-200 flex flex-col bg-white`}
       >
-        {/* ProjectHeader의 배경색은 이제 ProjectHeader 내부에서 accentColor로 직접 설정됨 */}
-        {/* 따라서 여기서는 배경색 클래스를 제거하거나 bg-transparent로 설정합니다. */}
-        <div className="w-full bg-transparent"> {/* 또는 simply: <div className="w-full"> */}
-          <ProjectHeader onClose={onClose} URLS={URLS} accentColor={accentColor} /> {/* accentColor 전달 */}
+
+        <div className="w-full bg-transparent"> 
+          <ProjectHeader onClose={onClose} URLS={URLS} accentColor={accentColor} />
         </div>
 
         {/* 모달 내부 스크롤 가능한 컨텐츠 영역 - 기본 텍스트 색상은 여기서 적용 */}
         <div className={`overflow-y-auto max-h-[90vh] text-left text-black text-sm leading-relaxed`}>
-          {/* 제목 및 기간 섹션 - 배경색이 있는 영역은 조건부 텍스트 색상 적용 */}
-          {/* 이 부분의 배경색과 텍스트 색상은 기존 로직 유지 (강조색을 따름) */}
           <div className={`mb-4 p-4 text-[15px] w-full ${textColorForAccentBackground}`} style={{ backgroundColor: accentColor }}>
             <h2 className={`text-2xl font-bold ${textColorForAccentBackground}`}>{modalTitle}</h2>
             {subtitle && <p className={`text-sm mt-1 ${textColorForAccentBackground}`}>{subtitle}</p>}
             <p className={`mt-1 ${textColorForAccentBackground}`}><span className="font-bold">{period}</span> | <span>{members}</span></p>
           </div>
 
-          {/* ... (나머지 모달 콘텐츠는 기존 로직 유지) */}
+     
           <div className="my-4 rounded-md overflow-hidden shadow-md">
                 <ProjectImageCarousel images={modalImages} />
             </div>
@@ -113,9 +110,30 @@ const ProjectModal = ({ show, onClose, project }) => {
                         >
                             {tech}
                         </span>
+                    
+                        
                     ))}
                 </div>
             </section>
+            {videoURL && (
+  <section className="mb-6">
+    <h3
+      className={`font-bold mb-2 text-[16px] block px-4 py-2 rounded ${textColorForAccentBackground}`}
+      style={{ backgroundColor: accentColor }}
+    >
+      🎬 시연 영상
+    </h3>
+    <div className="rounded-md shadow-md overflow-hidden">
+      <video
+        src={videoURL}
+        controls
+        className="w-full h-auto rounded-md"
+      >
+        브라우저가 video 태그를 지원하지 않습니다.
+      </video>
+    </div>
+  </section>
+)}
         </div>
       </div>
     </div>

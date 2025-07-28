@@ -142,6 +142,7 @@ const projects = [
     ],
     results: '여행 경험의 질을 높이고, 혼행족 커뮤니티 활성화에 기여하여 사용자들에게 더욱 풍부한 여행 경험을 제공할 수 있도록 지원했습니다.', // Adjusted to reflect your contribution
     techStack: ['Spring', 'Java', 'Python', 'MySQL', 'JSP', 'KakaoMapAPI'], // Kept existing tech stack, as Python can be used for backend/API without doing AI directly
+        videoURL: "/video/withus.mp4"
   },
 },
 {
@@ -194,6 +195,7 @@ const projects = [
     ],
     results: '소비자들이 신발 구매 시 객관적인 정보를 얻을 수 있도록 돕고, 제조업체에는 시장 트렌드 파악에 필요한 데이터를 시각적으로 제공하여 의사결정을 지원했습니다.', // Adjusted to reflect your contribution
     techStack: ['Python', 'Spring Boot', 'React', 'Koelectra', 'Chart.js'], // Kept existing tech stack, as Python can be used for backend/API without doing NLP directly
+        videoURL: "/video/readfit.mp4"
   },
 },
 {
@@ -242,6 +244,7 @@ const projects = [
     ],
     results: '복잡한 웨딩 준비 과정을 간소화하고, 예비부부에게 개인 맞춤형 웨딩 서비스를 효율적으로 제공했습니다. 특히 AI 추천 시스템과의 성공적인 연동으로 서비스의 핵심 가치를 높였습니다.', // Emphasized your contribution
     techStack: ['React', 'Node.js', 'MySQL', 'Python (FastAPI 연동)', 'Figma', 'Bootstrap', 'KakaoMapAPI', 'FullCalendarAPI', 'Weather API'], // Added FastAPI 연동 and FullCalendar/Weather API
+    videoURL: "/video/insight.mp4"
   },
 },
 {
@@ -296,6 +299,7 @@ const projects = [
     ],
     results: '실시간 위험 상황 대응력 강화, 보안 관리 효율성 향상. 특히 웹 및 모바일 앱을 통한 사용자 접근성 및 관리 편의성을 크게 높였습니다.', // Emphasized your contribution
     techStack: ['Node.js', 'MySQL', 'FastAPI', 'React', 'Flutter', 'WebSocket', 'OneSignal', 'KakaoMapAPI'], // Reflects your contribution in FE/BE/App
+    videoURL: "/video/askme.mp4"
   },
 }
 ];
