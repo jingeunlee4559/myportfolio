@@ -305,7 +305,7 @@ const projects = [
   },
 },
 {
-  title: '만사가 귀찮은 P들을 위한 여행데이터 기반 AI 여행지 추천 서비스',
+  title: '여행데이터 기반 AI 여행지 추천 서비스',
   subtitle: '여행 블로그 데이터 기반 맞춤형 AI 여행지 추천',
   tags: ['FE', '웹','디자인', '팀'],
   image: '/project-images/project_p1.png', // TODO: 실제 썸네일 이미지 경로로 수정
@@ -501,54 +501,54 @@ const Projects = () => {
         </span>
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {projects.map((project, index) => {
-          const aosType = index % 2 === 0 ? 'fade-left' : 'fade-right';
+   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+  {projects.map((project, index) => {
+    const aosType = index % 2 === 0 ? 'fade-left' : 'fade-right';
 
-          return (
-            <div
-              key={index}
-              className="relative group bg-white rounded-2xl overflow-hidden shadow-lg transform transition-transform hover:scale-105 flex flex-col h-full cursor-pointer"
-              onClick={(e) => openModal(project, e)}
-              data-aos={aosType}
-              data-aos-duration="1000"
-              data-aos-delay={`${(index % 3) * 200}`}
-            >
-              {/* 이미지 */}
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-48 object-cover"
-              />
+    return (
+      <div
+        key={index}
+        // ✅ width 제한: max-w-[360px] (원하면 320, 340로 조절)
+        className="relative group bg-white rounded-2xl overflow-hidden shadow-lg
+                   transform transition-transform hover:scale-105 flex flex-col h-full
+                   cursor-pointer w-full max-w-[410px] mx-auto"
+        onClick={(e) => openModal(project, e)}
+        data-aos={aosType}
+        data-aos-duration="1000"
+        data-aos-delay={`${(index % 3) * 200}`}
+      >
+        {/* ✅ 이미지 높이 줄이기: h-48 → h-40 (원하는 만큼 조절 가능) */}
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-45 object-cover"
+        />
 
-              {/* 오버레이 + 돋보기 아이콘 */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <FaSearch className="text-white text-3xl" />
-              </div>
-
-              {/* 프로젝트 설명 */}
-              <div className="bg-blue-50 w-full flex-1 flex flex-col justify-between p-5">
-                <div className="flex flex-wrap gap-2 justify-center mb-3">
-                  {project.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        tagColors[tag] || 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold mb-1">{project.title}</h3>
-                  <p className="text-sm text-gray-600">{project.subtitle}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {/* ✅ 텍스트 영역 패딩도 조금만 줄여서 전체 카드 높이 축소 */}
+        <div className="bg-blue-50 w-full flex-1 flex flex-col justify-between p-4">
+          <div className="flex flex-wrap gap-2 justify-center mb-3">
+            {project.tags.map((tag, i) => (
+              <span
+                key={i}
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  tagColors[tag] || 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div>
+            <h3 className="text-md font-bold mb-1">{project.title}</h3>
+            <p className="text-sm text-gray-600">
+              {project.subtitle}
+            </p>
+          </div>
+        </div>
       </div>
+    );
+  })}
+</div>
 
       {/* 모달 */}
       <ProjectModal
