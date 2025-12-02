@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ProjectModal from '../components/Projects/ProjectModal'; // 모달 컴포넌트 임포트
 import { FaSearch } from 'react-icons/fa';
 
-// 태그별 스타일 매핑 (기존과 동일)
+// 태그별 스타일 매핑
 const tagColors = {
   디자인: 'bg-pink-200 text-pink-800',
   FE: 'bg-blue-200 text-blue-800',
@@ -13,8 +13,10 @@ const tagColors = {
   팀: 'bg-purple-200 text-purple-800',
   AI: 'bg-red-200 text-red-800',
   시각화: 'bg-teal-200 text-teal-800',
-  BE : 'bg-skyblue-200 text-blue-800',
+  BE: 'bg-skyblue-200 text-blue-800',
 };
+
+
 
 // 프로젝트 데이터 (details 속성 포함)
 const projects = [
@@ -301,14 +303,183 @@ const projects = [
     techStack: ['Node.js', 'MySQL', 'FastAPI', 'React', 'Flutter', 'WebSocket', 'OneSignal', 'KakaoMapAPI'], // Reflects your contribution in FE/BE/App
     videoURL: "/video/askme.mp4"
   },
+},
+{
+  title: '만사가 귀찮은 P들을 위한 여행데이터 기반 AI 여행지 추천 서비스',
+  subtitle: '여행 블로그 데이터 기반 맞춤형 AI 여행지 추천',
+  tags: ['FE', '웹','디자인', '팀'],
+  image: '/project-images/project_p1.png', // TODO: 실제 썸네일 이미지 경로로 수정
+  type: 'generic',
+  details: {
+    modalTitle: 'P들의 블로그 여행데이터 기반 AI 여행지 추천 서비스',
+    subtitle: '여행 블로그 크롤링·임베딩 기반 AI 여행지 추천 플랫폼',
+    period: '2025.08 - 2025.08 (4주)', // TODO: 예) '2024.07 - 2024.08 (4주)'
+    members: '4인 개발 (프론트엔드 1, 백엔드/DB 2, PM & AI 1)',
+
+    modalImages: [
+      // TODO: 실제 캡처 이미지 경로들로 채우기
+      '/project-images/project_p2.webp',
+      '/project-images/project_p3.webp',
+      '/project-images/project_p4.webp',
+      '/project-images/project_p5.webp',
+      '/project-images/project_p6.webp',
+      '/project-images/project_p7.png',
+       '/project-images/project_p8.png',
+    ],
+
+    urls: {
+      githubURL: 'https://github.com/jingeunlee4559/miniproject2',   // TODO: 깃허브 레포 있으면 링크 입력
+      serviceURL: 'null',
+      blogURL: 'null'
+    },
+
+    overview:
+      '여행 블로그 데이터를 크롤링해 전처리·임베딩한 뒤, 사용자의 여행 성향(목적지, 계절, 동행, 여행 컨셉 등)에 맞춰 여행지를 추천해 주는 웹 서비스입니다. 저는 이 프로젝트에서 React 기반 웹 프론트엔드 개발을 담당했습니다.',
+
+features: [
+  {
+    heading: '여행 성향 입력 폼 & 검색 UI',
+    description:
+      '목적지(destination), 계절(season), 동행(companion), 여행 컨셉(TravelConcept) 등을 한 화면에서 직관적으로 입력할 수 있는 React 폼 화면을 설계했습니다. 사용자가 선택·입력한 값을 내부 상태로 관리하고, user_query(JSON) 형태로 묶어 AI 추천 API로 전달되도록 폼 구조와 이벤트 흐름을 구현했습니다.'
+  },
+  {
+    heading: 'AI 추천 결과 카드·리스트 화면',
+    description:
+      '백엔드/AI에서 내려주는 추천 여행지·코스 데이터를 받아, 여행지별 정보가 한눈에 들어오도록 카드·리스트 형태의 결과 화면을 구현했습니다. 로딩 중/요청 완료/결과 없음 등의 상태에 따라 다른 UI를 보여주고, 사용자가 스크롤하면서 여러 추천 결과를 자연스럽게 탐색할 수 있도록 레이아웃을 구성했습니다.'
+  },
+  {
+    heading: '카카오맵 연동 여행지 상세 페이지',
+    description:
+      '선택한 여행지의 위치를 KakaoMap API로 렌더링하고, 주소와 핵심 정보를 함께 볼 수 있는 상세 페이지를 구현했습니다. 지도 영역과 텍스트 정보를 상·하 또는 좌·우로 분리 배치해 위치 정보를 직관적으로 파악하면서, 여행지 설명·추가 정보도 동시에 확인할 수 있도록 UI를 설계했습니다.'
+  },
+  {
+    heading: '세션 기반 화면 흐름 및 메뉴 제어',
+    description:
+      '세션 기반 인증 정보를 프론트엔드 라우터와 연동해, 로그인 여부에 따라 접근 가능한 페이지와 메뉴가 달라지도록 화면 흐름을 구성했습니다. 게시글·댓글 작성, 마이페이지, 관리자 메뉴 등은 로그인 사용자 또는 관리자에게만 노출되도록 하고, 비로그인 사용자는 로그인/회원가입 페이지로 자연스럽게 유도되도록 네비게이션을 구현했습니다.'
+  }
+],
+
+    results:
+      '블로그 기반 실제 후기 데이터를 활용해 사용자의 조건에 맞는 여행지와 코스를 추천함으로써, 여행 계획을 번거로워하는 “만사가 귀찮은 P들”도 몇 번의 선택만으로 여행지를 쉽게 찾을 수 있도록 했습니다. AI 추천 결과를 지도·카테고리·상세 정보와 함께 시각화하여 서비스 활용성을 높였습니다.',
+
+    techStack: [
+      'React',
+      'JavaScript',
+      'HTML',
+      'CSS',
+      'Spring Boot',
+      'Java 17',
+      'Gradle',
+      'Oracle',
+      'KakaoMap API',
+      'OpenAI text-embedding-3-small'
+    ],
+
+    videoURL: "/video/ptravel.mp4"
+  }
+},
+{
+  title: 'Talaria - 문맥·문화 기반 실시간 AI 통역 플랫폼',
+  subtitle: '비즈니스·문화 모드 이중 인터페이스 실시간 회의 서비스',
+  tags: ['FE', '웹', '디자인', '팀'],
+  image: '/project-images/project_tal1.png', // TODO: 메인 썸네일 캡처로 교체
+  type: 'talaria',
+  details: {
+    modalTitle: 'Talaria - 문맥·문화 기반 실시간 AI 통역 & 컬쳐·매너 가이드',
+    subtitle: '파파고 기반 실시간 통역과 매너 모니터링을 제공하는 화상회의 플랫폼',
+    period: '2025.10~2025,12', // 예: '2025.09 - 2025.12 (3개월)'
+    members: '3인 개발',
+
+    modalImages: [
+      // TODO: 실제 Talaria 화면 캡처 경로들로 교체
+      '/project-images/project_tal2.png',
+      '/project-images/project_tal3.png',
+      '/project-images/project_tal4.png',
+      '/project-images/project_tal5.png',
+      '/project-images/project_tal13.webp',
+      '/project-images/project_tal6.png',
+      '/project-images/project_tal7.png',
+      '/project-images/project_tal8.png',
+      '/project-images/project_tal9.png',
+      '/project-images/project_tal10.png',
+      '/project-images/project_tal11.png',
+      '/project-images/project_tal12.png'
+    ],
+
+    urls: {
+      githubURL: 'https://github.com/elios404/talaria-frontend',      // 예: 'https://github.com/...'
+      serviceURL: 'null',     // 배포 주소 있으면 입력
+      blogURL: 'null'
+    },
+
+    overview:
+      'Talaria는 비즈니스 회의와 K-컬쳐/밈 라이브를 모두 지원하는 실시간 AI 통역 플랫폼으로, 회의 음성을 STT·번역해 자막으로 보여주고 매너 체크, 문서·회의록 연동까지 제공하는 서비스입니다. 저는 이 프로젝트에서 랜딩·대시보드·영상 회의·문화 라이브·문서/회의록 뷰어·파일 업로드 등 핵심 화면의 React 프론트엔드와 반응형 UI/UX 설계를 담당했습니다.',
+
+    features: [
+      {
+        heading: '비즈니스·컬쳐 모드 랜딩 페이지 & 공통 네비게이션',
+        description:
+          'Talaria의 핵심 가치와 비즈니스 모드/문화 모드를 소개하는 랜딩 페이지를 설계하고, 두 모드로 자연스럽게 진입할 수 있는 상단/사이드 네비게이션을 구현했습니다. 공통 헤더 컴포넌트로 로고, 모드 전환, 알림 아이콘, 프로필 드롭다운을 재사용 가능하게 구성하여, 화면이 달라져도 일관된 경험을 제공하도록 만들었습니다.'
+      },
+      {
+        heading: 'LiveKit 기반 실시간 회의 UI (비즈니스 모드)',
+        description:
+          'LiveKit 컴포넌트를 활용해 발언자/참가자 영상 타일을 자동 배치하는 커스텀 그리드를 구현하고, 우측에는 매너 체크 패널·문서 탭·채팅 탭을 사이드바 구조로 배치했습니다. 상단에는 원어, 하단에는 번역 자막을 덮어쓰는 STT 번역 오버레이 영역을 구성하고, 음성·카메라·화면공유·회의 종료 등 제어 버튼은 중앙 하단에 고정하여 회의 집중도가 높아지도록 UI를 설계했습니다.'
+      },
+      {
+        heading: '문화 라이브 전용 UI & 키워드/이모지 인터랙션',
+        description:
+          'K-POP·게임·밈 컨셉에 맞는 컬쳐 모드 전용 레이아웃을 설계하고, 영상 타일 위에 테마 배경과 이펙트를 적용했습니다. 채팅 패널에서는 신조어·밈 단어를 실시간으로 하이라이트하고, 이모지·임팩트 버튼을 통해 화면 위로 이펙트가 뜨는 구조를 구현했습니다. 모바일에서는 영상 상단, 제어 버튼 중앙, 채팅·임팩트·참가자 탭을 하단에 배치해 한 손 조작이 가능하도록 레이아웃을 조정했습니다.'
+      },
+      {
+        heading: '대시보드·문서/회의록 리스트 & PDF 뷰어 UI',
+        description:
+          '대시보드 홈에서 오늘 회의, To-Do, 일정, 최근 문서/회의록을 카드 형태로 한 번에 볼 수 있도록 구성하고, 문서·회의록 리스트 화면에서는 회의/언어/작성일 등으로 필터링·정렬이 가능하도록 UI를 설계했습니다. 선택한 문서는 PDF 뷰어 컴포넌트에서 원문·번역본을 나란히 또는 탭 전환으로 볼 수 있게 구현하고, 회의와 문서를 매핑하는 상태를 프론트에서 관리해 회의별 문서 흐름이 자연스럽게 이어지도록 만들었습니다.'
+      },
+      {
+        heading: '파일 업로드 플로우 & 알림/모달 UX',
+        description:
+          '문서 업로드 모달에서 언어 선택, 회의 연결 여부, RAG 활용 여부 등을 설정할 수 있는 폼을 구성하고, Drag & Drop 업로드, 용량/확장자 검증, 업로드 진행 상태 표시 등을 구현했습니다. 업로드 완료·오류·권한 부족 등의 상황에서는 SweetAlert2 기반 알림 모달로 명확한 피드백을 제공해, 사용자가 현재 상태를 헷갈리지 않도록 UX를 설계했습니다.'
+      },
+      {
+        heading: 'PC·태블릿·모바일 대응 반응형 회의/문화 레이아웃',
+        description:
+          '화면 크기에 따라 영상 타일 개수와 비율, 사이드바 표시 방식, 버튼 배치를 자동으로 조정하는 반응형 레이아웃을 구현했습니다. PC에서는 영상·문서·채팅이 한 화면에 동시에 보이도록 하고, 태블릿·모바일에서는 우선순위가 높은 영상과 자막을 상단에, 나머지는 탭·슬라이딩 패널로 전환하도록 설계해 다양한 디바이스에서 일관된 경험을 제공하도록 만들었습니다.'
+      }
+    ],
+
+    results:
+      '비즈니스 모드와 컬쳐 모드라는 서로 다른 사용 시나리오를 하나의 React 프론트엔드에서 일관되게 지원하도록 설계함으로써, 회의·라이브·문서·요약·매너 체크 기능을 자연스럽게 오갈 수 있는 사용자 경험을 구현했습니다. 모듈화된 레이아웃과 컴포넌트 구조, 반응형 설계를 통해 PC·태블릿·모바일 어디에서나 안정적인 화상회의·문화 라이브 환경을 제공할 수 있게 했습니다.',
+
+    techStack: [
+      'React',
+         'JavaScript',
+      'Vite',
+      'Tailwind CSS',
+      'LiveKit (React SDK)',
+      'react-router-dom',
+      'Axios',
+      'SweetAlert2',
+      'Figma (UI 설계)',
+      'GitHub'
+    ],
+
+    // videoURL: '/video/talaria.mp4' // TODO: 실제 Talaria 시연 영상 경로로 교체
+    videoURL: null // TODO: 실제 Talaria 시연 영상 경로로 교체
+
+  }
 }
+
 ];
 
 
 const Projects = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [modalPosition, setModalPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const [modalPosition, setModalPosition] = useState({
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  });
 
   const openModal = (project, e) => {
     setSelectedProject(project);
@@ -326,7 +497,7 @@ const Projects = () => {
       <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 text-center mb-12">
         <span className="inline-block relative pb-6">
           PROJECT
-          <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full"></span>
+          <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 rounded-full" />
         </span>
       </h2>
 
@@ -350,17 +521,20 @@ const Projects = () => {
                 className="w-full h-48 object-cover"
               />
 
-              {/*오버레이 + 돋보기 아이콘 */}
-<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-  <FaSearch className="text-white text-3xl" />
-</div>
+              {/* 오버레이 + 돋보기 아이콘 */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <FaSearch className="text-white text-3xl" />
+              </div>
+
               {/* 프로젝트 설명 */}
               <div className="bg-blue-50 w-full flex-1 flex flex-col justify-between p-5">
                 <div className="flex flex-wrap gap-2 justify-center mb-3">
                   {project.tags.map((tag, i) => (
                     <span
                       key={i}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${tagColors[tag] || 'bg-gray-200 text-gray-700'}`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        tagColors[tag] || 'bg-gray-200 text-gray-700'
+                      }`}
                     >
                       {tag}
                     </span>
@@ -380,7 +554,11 @@ const Projects = () => {
       <ProjectModal
         show={showModal}
         onClose={closeModal}
-        project={{ ...selectedProject, index: projects.indexOf(selectedProject) }}
+        project={
+          selectedProject
+            ? { ...selectedProject, index: projects.indexOf(selectedProject) }
+            : null
+        }
         position={modalPosition}
       />
     </section>
