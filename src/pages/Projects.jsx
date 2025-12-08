@@ -465,7 +465,7 @@ features: [
     ],
 
     // videoURL: '/video/talaria.mp4' // TODO: 실제 Talaria 시연 영상 경로로 교체
-    videoURL: null // TODO: 실제 Talaria 시연 영상 경로로 교체
+    videoURL: '/video/Talaria.mp4' // TODO: 실제 Talaria 시연 영상 경로로 교체
 
   }
 }

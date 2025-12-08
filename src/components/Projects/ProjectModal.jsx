@@ -26,7 +26,7 @@ const ProjectModal = ({ show, onClose, project }) => {
 
   // ✅ 특정 프로젝트 판별
   const isPTravelProject =
-    project?.title?.includes('만사가 귀찮은 P들을 위한');
+    project?.title?.includes('여행데이터 기반 AI 여행지 추천');
   const isTalariaProject =
     project?.title?.includes('Talaria');
 
@@ -40,12 +40,12 @@ const ProjectModal = ({ show, onClose, project }) => {
     accentColor = '#00BFA5';
   } else if (isTalariaProject) {
     // Talaria = 소통/온라인 회의 느낌 나는 스카이 블루
-    accentColor = '#0EA5E9';
+    accentColor = '#f5f3ff';
   }
 
   // ✅ 헤더/섹션 타이틀 글자색
   let textColorForAccentBackground = '';
-  if (accentColor === '#000000' || isPTravelProject || isTalariaProject) {
+  if (accentColor === '#000000' || isPTravelProject) {
     // 검정, P들의, Talaria 모두 흰 글자
     textColorForAccentBackground = 'text-white';
   }
