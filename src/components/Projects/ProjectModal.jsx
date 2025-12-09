@@ -28,7 +28,7 @@ const ProjectModal = ({ show, onClose, project }) => {
   const isPTravelProject =
     project?.title?.includes('여행데이터 기반 AI 여행지 추천');
   const isTalariaProject =
-    project?.title?.includes('Talaria');
+    project?.title?.includes('두 세계를 잇는 실시간 AI 번역 플랫폼');
 
   // 기본 accentColor
   const baseAccentColor = backgroundMap[projectIndex] || '#FFF6CF';
