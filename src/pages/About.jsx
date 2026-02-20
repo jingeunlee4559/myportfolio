@@ -87,6 +87,15 @@ const About = () => {
                 EDUCATION
               </div>
               <ul className="text-base text-gray-700 space-y-3">
+                   <li>
+                  <span className="font-semibold">
+                    AI서비스개발자 과정
+                  </span>
+                  <br />
+                  <span className="text-gray-500 text-sm">
+                    2025.06 ~ 2025.12
+                  </span>
+                    </li>
                 <li>
                   <span className="font-semibold">
                     앱기반인공지능(풀스택) 과정
@@ -133,6 +142,11 @@ const About = () => {
                 AWARDS
               </div>
               <ul className="text-base text-gray-700 space-y-3">
+                  <li>
+                  <span className="font-semibold">
+                    2025 실전프로젝트 우수상
+                  </span>
+                </li>
                 <li>
                   <span className="font-semibold">
                     2024 핵심프로젝트 최우수상
