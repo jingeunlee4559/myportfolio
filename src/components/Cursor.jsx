@@ -1,35 +1,70 @@
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { useEffect, useRef } from "react";
+import { gsap } from "../lib/gsap";
+import { reduced } from "../lib/env";
 
-// 마우스를 따라다니는 점과 고리. 버튼·카드 위에서는 커지고, data-cursor가 있으면 글자가 나타납니다. (터치 기기에서는 숨김)
+// 마우스 포인터: 작은 파란 점 + 살짝 늦게 따라오는 고리.
+//  · 버튼·링크 위: 고리가 커지고 그 버튼 쪽으로 살짝 끌려감
+//  · data-cursor="보기" 같은 글이 달린 곳(노트북·카드): 고리가 글자가 든 알약 모양으로 바뀜
+//  · 어두운 장면 위(다크 모드의 히어로·기술 포함): 흰색으로 바뀜
+//  · 글 입력 칸 위: 숨김 (원래 글자 커서를 씀)
+// 터치 화면(휴대폰·태블릿)에서는 쓰지 않습니다.
+// 늘 어두운 곳 / 다크 모드에서만 어두운 곳(히어로·기술)
+const DARK = "footer, .acc-p, .wa-dev, .intro, .chp-lap";
+const DARK_IN_DARK = ".st-wall, .st-hero, .st-cue, .sk2";
+const HOT = "a, button, [role='button'], label, select, summary, [data-cursor]";
+
 export default function Cursor() {
-  const x = useMotionValue(-100), y = useMotionValue(-100);
-  const dx = useSpring(x, { stiffness: 700, damping: 40, mass: 0.3 }), dy = useSpring(y, { stiffness: 700, damping: 40, mass: 0.3 });
-  const rx = useSpring(x, { stiffness: 160, damping: 20 }), ry = useSpring(y, { stiffness: 160, damping: 20 });
-  const [fine, setFine] = useState(false), [big, setBig] = useState(false), [label, setLabel] = useState("");
+  const dot = useRef(null), ring = useRef(null), txt = useRef(null);
   useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    setFine(true);
-    const mv = (e) => {
-      x.set(e.clientX); y.set(e.clientY);
-      const t = e.target.closest?.("[data-cursor]");
-      setLabel(t?.dataset.cursor ?? "");
-      setBig(!!t || !!e.target.closest?.("a,button,[role=button],.card,input,textarea"));
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!fine.matches) return;
+    const html = document.documentElement;
+    html.classList.add("cur-on");
+    const d = dot.current, r = ring.current;
+    gsap.set([d, r], { xPercent: -50, yPercent: -50, x: -100, y: -100 });
+    const dx = gsap.quickTo(d, "x", { duration: 0.08, ease: "power3" }), dy = gsap.quickTo(d, "y", { duration: 0.08, ease: "power3" });
+    const rx = gsap.quickTo(r, "x", { duration: reduced ? 0.01 : 0.45, ease: "power3" }), ry = gsap.quickTo(r, "y", { duration: reduced ? 0.01 : 0.45, ease: "power3" });
+    let hot = null, label = "", seen = false;
+    const mode = (cls, on) => r.classList.toggle(cls, on);
+    const move = (e) => {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      if (!seen) { seen = true; html.classList.add("cur-seen"); gsap.set([d, r], { x: e.clientX, y: e.clientY }); }
+      dx(e.clientX); dy(e.clientY);
+      // 버튼 위에서는 고리가 버튼 가운데 쪽으로 30% 끌려감
+      if (hot && !label) { const b = hot.getBoundingClientRect(); rx(e.clientX + (b.left + b.width / 2 - e.clientX) * 0.3); ry(e.clientY + (b.top + b.height / 2 - e.clientY) * 0.3); }
+      else { rx(e.clientX); ry(e.clientY); }
     };
-    window.addEventListener("pointermove", mv, { passive: true });
-    return () => window.removeEventListener("pointermove", mv);
-  }, [x, y]);
-  if (!fine) return null;
-  const size = label ? 92 : big ? 64 : 40;
+    const over = (e) => {
+      const t = e.target instanceof Element ? e.target : null; if (!t) return;
+      const typing = t.closest("input, textarea, [contenteditable='true']");
+      html.classList.toggle("cur-hide", !!typing);
+      const h = t.closest(HOT);
+      const lab = h?.closest("[data-cursor]")?.dataset.cursor || "";
+      hot = h && !lab ? h : null;
+      label = lab;
+      if (lab) txt.current.textContent = lab;
+      mode("is-hot", !!hot); mode("is-label", !!lab);
+      const dark = !!t.closest(DARK) || (html.classList.contains("dark") && !!t.closest(DARK_IN_DARK));
+      d.classList.toggle("is-dark", dark); r.classList.toggle("is-dark", dark);
+    };
+    const down = () => r.classList.add("is-down"), up = () => r.classList.remove("is-down");
+    const leave = () => html.classList.remove("cur-seen");
+    const enter = () => seen && html.classList.add("cur-seen");
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerover", over, { passive: true });
+    window.addEventListener("pointerdown", down); window.addEventListener("pointerup", up);
+    document.addEventListener("pointerleave", leave); document.addEventListener("pointerenter", enter);
+    return () => {
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerover", over);
+      window.removeEventListener("pointerdown", down); window.removeEventListener("pointerup", up);
+      document.removeEventListener("pointerleave", leave); document.removeEventListener("pointerenter", enter);
+      html.classList.remove("cur-on", "cur-seen", "cur-hide");
+    };
+  }, []);
   return (
     <>
-      <motion.div style={{ x: rx, y: ry }} className="pointer-events-none fixed left-0 top-0 z-[90]" aria-hidden="true">
-        <motion.div animate={{ width: size, height: size, opacity: big ? 1 : 0.7 }} transition={{ type: "spring", stiffness: 300, damping: 24 }}
-          className={`-translate-x-1/2 -translate-y-1/2 grid place-items-center rounded-full text-[13px] font-extrabold tracking-[0.04em] text-white ${label ? "bg-accent shadow-[0_14px_40px_-8px_rgba(47,140,255,.9)]" : "border-2 border-accent bg-accent/10"}`}>
-          {label}
-        </motion.div>
-      </motion.div>
-      <motion.div style={{ x: dx, y: dy }} className={`pointer-events-none fixed left-0 top-0 z-[90] -ml-[3px] -mt-[3px] h-1.5 w-1.5 rounded-full bg-accent transition-opacity ${label ? "opacity-0" : "opacity-100"}`} aria-hidden="true" />
+      <div ref={ring} className="cur-ring" aria-hidden="true"><span ref={txt} /></div>
+      <div ref={dot} className="cur-dot" aria-hidden="true" />
     </>
   );
 }

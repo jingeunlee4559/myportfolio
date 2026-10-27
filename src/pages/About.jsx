@@ -1,143 +1,177 @@
-import { useRef } from "react";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
-import { FaReact, FaServer, FaTrophy } from "react-icons/fa6";
+import { useLayoutEffect, useRef, useState } from "react";
+import { FaFilePdf, FaArrowRight } from "react-icons/fa6";
 import portrait from "../assets/portrait.jpg";
 import { PROFILE, INTRO, EDUCATION, AWARDS } from "../data/profile";
-import { projects } from "../data/projects";
-import SectionHead from "../components/SectionHead";
-import Reveal from "../components/Reveal";
-import Counter from "../components/Counter";
-import ScrollWords from "../components/ScrollWords";
-import Tilt from "../components/Tilt";
+import { CHAPTERS, MORE } from "../data/story";
+import { gsap } from "../lib/gsap";
+import { guideTrack } from "../lib/guide";
+import { reduced } from "../lib/env";
 
-const EDU = [...EDUCATION].reverse(); // 최신이 위
-const AW = [...AWARDS].sort((a, b) => b.year - a.year); // 최신 연도가 위 (같은 해는 등급 순)
-const COURSES = EDUCATION.filter((e) => e.tag === "교육과정").length;
-const stats = [[projects.length, "개", "팀 프로젝트", "text-accent"], [AWARDS.length, "회", "수상", "text-coral"], [COURSES, "개", "교육과정", "text-violet"]];
-const areas = [
-  [FaReact, "Frontend", "React로 지도, 차트, 실시간 화면까지. 헷갈리지 않는 화면을 만듭니다.", "text-accent bg-accent/10"],
-  [FaServer, "Backend", "Spring Boot·Node.js로 로그인, REST API, 실시간 알림을 구성합니다.", "text-mint bg-mint/10"],
-];
+// 소개 — 프로젝트 이야기에서 이어지는 두 번째 장(CHAPTER 02)
+//  ① 장 제목 "저를 소개합니다." + 옆으로 그어지는 가는 선
+//  ② 마침표가 사진 가운데로 내려가고, 그 점에서 사진이 동그랗게 열림. 소개 글은 읽는 속도에 맞춰 한 단어씩 진해짐
+//  ③ 걸어온 길: 세로 선 위의 마디를 마침표가 한 칸씩 타고 내려가고, 왼쪽 큰 연도가 바뀜
+//  ④ 수상: 대상은 큰 금빛 카드, 나머지는 메달 카드로 하나씩 올라옴
+const YEAR = (e) => e.period.slice(0, 4);
 
-// 마우스를 따라 기울어지는 사진 카드 + 빙글 도는 무지개 테두리
-function Photo() {
-  const ref = useRef(null);
-  const px = useMotionValue(0), py = useMotionValue(0);
-  const rx = useSpring(useTransform(py, [-0.5, 0.5], [8, -8]), { stiffness: 140, damping: 18 });
-  const ry = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), { stiffness: 140, damping: 18 });
-  const ring = "WEB DEVELOPER • JINGEUN LEE • ";
-  return (
-    <Reveal className="relative [perspective:1200px]">
-      <motion.div ref={ref} style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-        onPointerMove={(e) => { const r = ref.current.getBoundingClientRect(); px.set((e.clientX - r.left) / r.width - 0.5); py.set((e.clientY - r.top) / r.height - 0.5); }}
-        onPointerLeave={() => { px.set(0); py.set(0); }} className="relative mx-auto max-w-[420px] md:max-w-none">
-        <div className="absolute -inset-6 -z-10 rounded-[56px] bg-gradient-to-br from-accent/40 via-cyan/30 to-violet/30 blur-3xl" aria-hidden="true" />
-        <div className="glow-border rounded-[40px]">
-          <div className="rounded-[38px] bg-white p-3 shadow-[0_40px_80px_-40px_rgba(47,140,255,.55)]">
-            <div className="relative overflow-hidden rounded-[28px]">
-              <img src={portrait} alt={`${PROFILE.name} 프로필 사진`} width="800" height="1000" loading="lazy" className="block aspect-[4/5] w-full object-cover object-[50%_58%] transition-transform duration-700 hover:scale-[1.04]" />
-              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" aria-hidden="true" />
-              <div className="absolute inset-x-5 bottom-5 flex items-end justify-between text-white">
-                <div><p className="text-2xl font-extrabold tracking-[-0.04em]">{PROFILE.name}</p><p className="eyebrow !text-white/80">{PROFILE.nameEn}</p></div>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ink">{PROFILE.role}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="float-a absolute -left-3 bottom-28 z-10 flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-extrabold shadow-[0_20px_40px_-18px_rgba(30,80,170,.5)] md:-left-9" style={{ transform: "translateZ(80px)" }} aria-hidden="true"><span className="text-lg">⚛️</span>React</div>
-        <div className="float-b absolute -right-2 bottom-12 z-10 flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-extrabold shadow-[0_20px_40px_-18px_rgba(30,80,170,.5)] md:-right-8" style={{ transform: "translateZ(70px)" }} aria-hidden="true"><span className="text-lg">🏆</span>수상 {AWARDS.length}회</div>
-        <div className="absolute -right-4 -top-7 grid h-28 w-28 place-items-center rounded-full bg-accent text-white shadow-[0_20px_40px_-18px_rgba(47,140,255,.7)] md:-right-8 md:h-36 md:w-36" style={{ transform: "translateZ(60px)" }} aria-hidden="true">
-          <svg viewBox="0 0 120 120" className="spin-slow absolute inset-0 h-full w-full">
-            <defs><path id="circ" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0" /></defs>
-            <text className="fill-white font-mono text-[9.5px] font-semibold uppercase tracking-[0.18em]"><textPath href="#circ" textLength="268" lengthAdjust="spacing">{ring}</textPath></text>
-          </svg>
-          <span className="text-3xl">✦</span>
-        </div>
-      </motion.div>
-    </Reveal>
-  );
-}
-
-// 소개 · 교육 · 수상을 한 흐름으로: 왼쪽은 고정, 오른쪽은 스크롤하며 이야기가 이어집니다
 export default function About() {
-  const olRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: olRef, offset: ["start 72%", "end 55%"] });
-  const fill = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  const root = useRef(null), yearRef = useRef(null);
+  const [cur, setCur] = useState(0);
+  let k = 0;
+  const paras = INTRO.body.map((t) => t.split(" ").map((w) => ({ w, k: k++ })));
+
+  useLayoutEffect(() => {
+    if (reduced) return;
+    const ctx = gsap.context(() => {
+      const q = (s) => root.current.querySelector(s), qa = (s) => [...root.current.querySelectorAll(s)];
+      // 마침표 길잡이: 장 제목 → 사진 가운데 → 이름 → 걸어온 길 제목 → 지금 단계의 마디 → 수상 제목
+      guideTrack(root.current, () => [q(".ab-h .gd-p"), q(".ab-eye"), q(".ab-photo figcaption .gd-p"), q(".ab-journey .ab-sec-title .gd-p"), q(".ab-row.on .ab-node"), q(".ab-awards-wrap .ab-sec-title .gd-p")], { line: 0.7, start: "top 75%", end: "bottom 40%" });
+      // ① 장 제목
+      gsap.fromTo(".ab-h-in > *", { yPercent: 110 }, { yPercent: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: ".ab-head", start: "top 80%" } });
+      gsap.fromTo(".ab-head .ab-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-head", start: "top 85%" } });
+      gsap.fromTo(".ab-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: "expo.out", delay: 0.2, scrollTrigger: { trigger: ".ab-head", start: "top 80%" } });
+      // ② 점에서 사진이 동그랗게 열림
+      gsap.fromTo(".ab-photo", { clipPath: "circle(2.5% at 50% 50%)" }, { clipPath: "circle(75% at 50% 50%)", ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "center 42%", scrub: 0.6 } });
+      gsap.fromTo(".ab-photo img", { scale: 1.35 }, { scale: 1, ease: "none", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "bottom 30%", scrub: 0.6 } });
+      gsap.fromTo(".ab-photo figcaption > *", { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.08, ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 50%", end: "center 36%", scrub: 0.6 } });
+      gsap.fromTo(".ab-halo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 60%", end: "center 35%", scrub: 0.6 } });
+      gsap.fromTo(".ab-copy .ab-label", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-copy", start: "top 80%" } });
+      gsap.fromTo(".ab-fw", { opacity: 0.16 }, { opacity: 1, stagger: 0.05, ease: "none", scrollTrigger: { trigger: ".ab-copy", start: "top 75%", end: "bottom 50%", scrub: 0.5 } });
+      gsap.fromTo(".ab-copy .st-more", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-copy .st-more", start: "top 92%" } });
+      // ③ 걸어온 길
+      qa(".ab-row").forEach((el, i) => {
+        gsap.timeline({ scrollTrigger: { trigger: el, start: "top 66%", end: "bottom 66%", onToggle: (st) => st.isActive && setCur(i) } });
+        gsap.fromTo(el.querySelectorAll(".ab-row-in > *"), { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.06, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" } });
+      });
+      gsap.fromTo(".ab-prog i", { scaleY: 0 }, { scaleY: 1, ease: "none", scrollTrigger: { trigger: ".ab-tl2", start: "top 66%", end: "bottom 66%", scrub: 0.4 } });
+      // ④ 수상
+      // 대상 카드: 카드가 올라오며 월계수 잎이 한 장씩 그려지고, "대상" 글자에 금빛이 스침
+      const aw = gsap.timeline({ scrollTrigger: { trigger: ".aw", start: "top 80%" } });
+      aw.fromTo(".aw-hero", { opacity: 0, y: 60, rotateX: 12 }, { opacity: 1, y: 0, rotateX: 0, duration: 1.2, ease: "expo.out" })
+        .fromTo(".aw-leaf", { strokeDashoffset: 1, fillOpacity: 0 }, { strokeDashoffset: 0, fillOpacity: 0.18, duration: 0.5, stagger: 0.035, ease: "power2.out" }, 0.25)
+        .fromTo(".aw-big > *", { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: 0.06, ease: "expo.out" }, 0.35)
+        .fromTo(".aw-hero-meta > *", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.07, ease: "expo.out" }, 0.6)
+        .fromTo(".aw-row", { opacity: 0, x: 40, clipPath: "inset(0 0 0 100%)" }, { opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)", duration: 0.9, stagger: 0.1, ease: "expo.out" }, 0.3);
+      qa(".ab-sec-title").forEach((el) => gsap.fromTo(el, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.9, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" } }));
+    }, root);
+    return () => ctx.revert();
+  }, []);
+
+  // 연도가 바뀔 때 아래에서 올라오는 효과
+  useLayoutEffect(() => {
+    if (reduced || !yearRef.current) return;
+    gsap.fromTo(yearRef.current, { yPercent: 40, opacity: 0, filter: "blur(8px)" }, { yPercent: 0, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "expo.out" });
+  }, [cur]);
+
+  const steps = EDUCATION; // 오래된 것 → 최근
+  const dot = <i className="gd-p" aria-hidden="true" />;
+  const [top, ...rest] = AWARDS;
+  const open = (i) => window.dispatchEvent(new CustomEvent("open-project", { detail: i }));
+  // 상을 받은 프로젝트의 짧은 이름 (story.js의 이름을 그대로 씀)
+  const SHORT = Object.fromEntries([...Object.values(CHAPTERS).map((c) => [c.idx, c.name]), ...MORE.map((m) => [m.idx, m.short])]);
+  const pname = (i) => SHORT[i] ?? "";
   return (
-    <section id="about" className="relative mx-auto max-w-6xl px-5 py-24 md:py-36">
-      <div className="pointer-events-none absolute -right-40 top-40 -z-10 h-[520px] w-[520px] rounded-full bg-cyan/20 blur-[120px]" aria-hidden="true" />
-      <div className="pointer-events-none absolute -left-40 top-[60%] -z-10 h-[520px] w-[520px] rounded-full bg-violet/10 blur-[130px]" aria-hidden="true" />
-      <SectionHead no="01" label="About" title="소개" desc="전공에서 시작해 지금까지, 무엇을 배우고 어떻게 만들어 왔는지 한 흐름으로 담았어요." />
-      <div className="grid items-start gap-12 md:grid-cols-12 md:gap-14">
-        <div className="md:sticky md:top-28 md:col-span-5">
-          <Photo />
-          <div className="mt-8 grid grid-cols-3 gap-3">
-            {stats.map(([n, u, t, c], i) => (
-              <Reveal key={t} delay={i * 0.08}>
-                <Tilt max={12} className="card p-4 text-center md:p-5">
-                  <p className={`flex items-baseline justify-center font-extrabold tabular-nums tracking-[-0.06em] ${c}`}><span className="text-4xl md:text-5xl"><Counter to={n} delay={0.2 + i * 0.1} /></span><span className="ml-0.5 text-base">{u}</span></p>
-                  <p className="mt-1.5 text-[12px] font-semibold leading-snug text-mute">{t}</p>
-                </Tilt>
-              </Reveal>
+    <section id="about" ref={root} className={`ab ${reduced ? "ab-static" : ""}`}>
+      <div className="ab-wrap">
+        {/* ① 장 제목 */}
+        <div className="ab-head">
+          <p className="ab-kick"><b>02</b> ABOUT</p>
+          <h2 className="ab-h" aria-label="저를 소개합니다."><span className="ab-h-in" aria-hidden="true"><span>저를 소개합니다{dot}</span></span></h2>
+          <i className="ab-rule" aria-hidden="true" />
+        </div>
+
+        {/* ② 사진 + 소개 */}
+        <div className="ab-profile">
+          <div className="ab-photo-wrap">
+            <span className="ab-halo" aria-hidden="true" />
+            <figure className="ab-photo">
+              <img src={portrait} alt={`${PROFILE.name} 프로필 사진`} width="800" height="1000" loading="lazy" />
+              <i className="ab-eye" aria-hidden="true" data-gd-size="22" />
+              <figcaption><b>{PROFILE.name}<i className="gd-p" data-gd-tone="light" aria-hidden="true" /></b><span>{PROFILE.nameEn} · {PROFILE.role}</span></figcaption>
+            </figure>
+          </div>
+          <div className="ab-copy">
+            <p className="ab-label">ABOUT ME</p>
+            {paras.map((ws, i) => (
+              <p key={i} className={i === 0 ? "ab-lead" : "ab-body"} aria-label={INTRO.body[i]}>
+                {ws.map(({ w, k }) => <span key={k} className="ab-fw" aria-hidden="true">{w} </span>)}
+              </p>
             ))}
+            {PROFILE.resume && <a href={PROFILE.resume} target="_blank" rel="noopener noreferrer" className="st-more"><FaFilePdf aria-hidden="true" />이력서 보기</a>}
           </div>
         </div>
 
-        <div className="md:col-span-7">
-          <ScrollWords text={INTRO.lead} className="text-[clamp(1.9rem,4vw,3.4rem)] font-extrabold leading-[1.28] tracking-[-0.06em]" />
-          <Reveal delay={0.05}><div className="mt-7 space-y-5 text-[16.5px] leading-[1.9] text-mute">{INTRO.body.map((t) => <p key={t}>{t}</p>)}</div></Reveal>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {areas.map(([Icon, t, d, c], i) => (
-              <Reveal key={t} delay={i * 0.08}>
-                <Tilt className="card spot h-full p-6">
-                  <span className={`grid h-11 w-11 place-items-center rounded-2xl text-lg ${c}`}><Icon aria-hidden="true" /></span>
-                  <h3 className="mt-4 text-lg font-extrabold tracking-[-0.03em]">{t}</h3>
-                  <p className="mt-1.5 text-[14.5px] leading-relaxed text-mute">{d}</p>
-                </Tilt>
-              </Reveal>
-            ))}
-          </div>
-
-          {/* 배움의 기록 + 받은 상 */}
-          <Reveal className="mb-8 mt-20"><p className="text-sm font-extrabold text-accent">배움의 기록</p><h3 className="mt-2 text-[clamp(1.8rem,3.4vw,2.6rem)] font-extrabold tracking-[-0.055em]">하나씩 배우고,<br className="hidden sm:block" /> 직접 만들며 성장해 왔어요</h3></Reveal>
-          <ol ref={olRef} className="relative space-y-5 pl-9">
-            <i className="absolute bottom-2 left-[7px] top-2 w-[2px] rounded-full bg-accent/15" aria-hidden="true" />
-            <motion.i style={{ scaleY: fill }} className="absolute bottom-2 left-[7px] top-2 w-[2px] origin-top rounded-full bg-gradient-to-b from-accent via-cyan to-violet" aria-hidden="true" />
-            {EDU.map((e, i) => (
-              <li key={e.title} className="relative">
-                <motion.i initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true, margin: "-40% 0px" }} transition={{ type: "spring", stiffness: 260, damping: 16 }} className={`absolute -left-[35px] top-8 h-4 w-4 rounded-full border-[3px] tl-ring ${e.awards ? "tl-dot-on bg-accent shadow-[0_0_0_6px_rgba(47,140,255,.2),0_0_24px_rgba(47,140,255,.7)]" : "bg-sky"}`} aria-hidden="true" />
-                <Reveal delay={i * 0.04}>
-                  <div className="card edu-card spot p-6 hover:-translate-y-1 md:p-8">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><span className="edu-tag rounded-full px-3 py-1 text-xs font-extrabold">{e.tag}</span><span className="font-mono text-sm font-semibold tabular-nums text-mute">{e.period}</span></div>
-                    <h4 className="mt-3 text-[clamp(1.2rem,2.2vw,1.6rem)] font-extrabold leading-snug tracking-[-0.04em]">{e.title}</h4>
-                    <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-mute">{e.desc}</p>
-                    {e.awards && <ul className="mt-4 flex flex-wrap gap-2">{e.awards.map((a) => <li key={a} className="inline-flex items-center gap-2 rounded-full award-chip px-3.5 py-1.5 text-sm font-bold"><span aria-hidden="true">🏆</span>{a}</li>)}</ul>}
-                  </div>
-                </Reveal>
-              </li>
-            ))}
-          </ol>
-
-          <Reveal className="mt-8">
-            <div className="glow-border rounded-[34px]">
-              <div className="relative overflow-hidden rounded-[32px] bg-night p-8 text-white md:p-10">
-                <span className="drift pointer-events-none absolute -right-14 -top-14 h-64 w-64 rounded-full bg-accent/50 blur-3xl" aria-hidden="true" />
-                <span className="drift pointer-events-none absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-violet/40 blur-3xl" style={{ animationDelay: "-6s" }} aria-hidden="true" />
-                <span className="shine pointer-events-none absolute inset-y-0 left-0 w-1/6 bg-white/10 blur-xl" aria-hidden="true" />
-                <p className="relative flex items-center gap-2 text-sm font-bold text-sky"><FaTrophy aria-hidden="true" />지금까지 받은 상</p>
-                <p className="hl relative mt-2 text-[clamp(3rem,7vw,5.4rem)] font-extrabold leading-none tracking-[-0.07em]">{AWARDS.length}회 수상</p>
-                <ul className="relative mt-7 divide-y divide-white/10">
-                  {AW.map((a) => (
-                    <li key={a.year + a.title + a.rank} className="group flex items-baseline gap-4 py-3.5 transition-colors hover:bg-white/[0.04]">
-                      <span className="w-12 shrink-0 font-mono text-sm font-bold tabular-nums text-white/50">{a.year}</span>
-                      <b className="w-24 shrink-0 text-lg font-extrabold tracking-[-0.03em] text-[#ffd84a] transition-transform group-hover:translate-x-1">{a.rank}</b>
-                      <span className="text-[15px] font-semibold text-white/85">{a.title}</span>
-                    </li>
-                  ))}
-                </ul>
+        {/* ③ 걸어온 길 */}
+        <div className="ab-journey">
+          <h3 className="ab-sec-title">걸어온 길{dot}</h3>
+          <div className="ab-jgrid">
+            <div className="ab-side" aria-hidden="true">
+              <div className="ab-sticky-year">
+                <p className="ab-count"><b>{String(cur + 1).padStart(2, "0")}</b> / {String(steps.length).padStart(2, "0")}<span className="ab-tag">{steps[cur].tag}</span></p>
+                <p ref={yearRef} className="ab-year">{YEAR(steps[cur])}</p>
+                <div className="ab-dots">{steps.map((s, i) => <i key={s.title} className={i === cur ? "on" : i < cur ? "done" : ""} />)}</div>
               </div>
             </div>
-          </Reveal>
+            <ol className="ab-tl2">
+              <span className="ab-prog" aria-hidden="true"><i /></span>
+              {steps.map((e, i) => (
+                <li key={e.title} className={`ab-row ${i === cur || reduced ? "on" : ""} ${i < cur ? "done" : ""}`}>
+                  <i className="ab-node" aria-hidden="true" data-gd-size="14" />
+                  <div className="ab-row-in">
+                    <p className="ab-period">{e.period}<em>{e.tag}</em></p>
+                    <h4 className="ab-title">{e.title}</h4>
+                    <p className="ab-desc">{e.desc}</p>
+                    {e.awards && <p className="ab-chips">{e.awards.map((a) => <span key={a}>{a}</span>)}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* ④ 수상 */}
+        <div className="ab-awards-wrap">
+          <h3 className="ab-sec-title">수상 {AWARDS.length}회{dot}</h3>
+          <div className="aw">
+            {/* 대상: 남색 카드 위 금빛 월계수 */}
+            <button type="button" className="aw-hero" onClick={() => open(top.idx)} data-cursor="보기" aria-label={`${top.year} ${top.title} ${top.rank}, ${pname(top.idx)} 자세히 보기`}>
+              <svg className="aw-laurel" viewBox="0 0 240 220" aria-hidden="true">
+                {/* 월계수: 아래 가운데에서 양쪽으로 둥글게 올라가는 두 가지 */}
+                {[1, -1].map((side) => (
+                  <g key={side} transform={side < 0 ? "translate(240 0) scale(-1 1)" : undefined}>
+                    <path className="aw-leaf aw-stem" pathLength="1" fill="none" d={`M${120 + 84 * Math.cos((100 * Math.PI) / 180)},${110 + 84 * Math.sin((100 * Math.PI) / 180)} A84 84 0 0 1 ${120 + 84 * Math.cos((228 * Math.PI) / 180)},${110 + 84 * Math.sin((228 * Math.PI) / 180)}`} />
+                    {Array.from({ length: 9 }, (_, k) => {
+                      const th = 106 + k * 14, r = (th * Math.PI) / 180;
+                      const x = 120 + 84 * Math.cos(r), y = 110 + 84 * Math.sin(r);
+                      const rot = th + 90 + (k % 2 ? 34 : -34) + 180, sc = 1.15 - k * 0.05;
+                      return <path key={k} className="aw-leaf" pathLength="1" transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot}) scale(${sc.toFixed(2)})`} d="M0,0 C6,-7 17,-7 26,0 C17,7 6,7 0,0Z" />;
+                    })}
+                  </g>
+                ))}
+              </svg>
+              <span className="aw-hero-glow" aria-hidden="true" />
+              <span className="aw-big" aria-hidden="true"><span>{top.rank}</span></span>
+              <span className="aw-hero-meta">
+                <span className="aw-y">{top.year} · {top.place}등</span>
+                <b>{top.title}</b>
+                <small>{top.from}</small>
+                <em>{pname(top.idx)} <FaArrowRight aria-hidden="true" /></em>
+              </span>
+            </button>
+            {/* 나머지: 시상식 명단처럼 한 줄씩 */}
+            <ol className="aw-list">
+              {rest.map((a) => (
+                <li key={`${a.year}${a.title}${a.rank}`}>
+                  <button type="button" className={`aw-row ${a.place === 1 ? "aw-gold" : "aw-silver"}`} onClick={() => open(a.idx)} data-cursor="보기">
+                    <span className="aw-medal" aria-hidden="true"><i /></span>
+                    <span className="aw-rank">{a.rank}<span className="aw-place">{a.place}등</span></span>
+                    <span className="aw-info"><b><span className="aw-y">{a.year}</span>{a.title}</b><small>{a.from}</small></span>
+                    <span className="aw-proj">{pname(a.idx)}<FaArrowRight aria-hidden="true" /></span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
     </section>

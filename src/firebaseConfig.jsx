@@ -12,6 +12,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export { app };
+// .env가 없으면 방명록만 꺼지고 사이트는 정상으로 뜹니다.
+export const firebaseReady = Boolean(firebaseConfig.projectId && firebaseConfig.apiKey);
+export const app = firebaseReady ? initializeApp(firebaseConfig) : null;
+export const db = app ? getFirestore(app) : null;

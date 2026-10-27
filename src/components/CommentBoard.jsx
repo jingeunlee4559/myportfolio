@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import SectionHead from "./SectionHead";
-import Aurora from "./Aurora";
-import { useDark } from "../lib/theme";
+import { guideZone } from "../lib/guide";
 import { db } from "../firebaseConfig";
 import { collection, addDoc, serverTimestamp, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
@@ -22,7 +21,12 @@ function Burst() {
 }
 
 export default function CommentBoard() {
-  const dark = useDark();
+  // 마침표 길잡이: "방명록." 끝
+  const secRef = useRef(null);
+  useEffect(() => {
+    const st = guideZone(secRef.current, () => secRef.current?.querySelector("h2 .gd-p"), { start: "top 60%", end: "bottom 75%" });
+    return () => st.kill();
+  }, []);
   const [comments, setComments] = useState([]);
   const [nickname, setNickname] = useState("");
   const [text, setText] = useState("");
@@ -33,6 +37,7 @@ export default function CommentBoard() {
   const loaded = useRef(false);
 
   useEffect(() => {
+    if (!db) return; // .env(Firebase 설정)가 없으면 방명록을 불러오지 않습니다.
     const q = query(collection(db, "comments"), orderBy("createdAt", "desc"), limit(30));
     return onSnapshot(q, (snap) => {
       // 처음 불러올 때는 강조하지 않고, 그 뒤에 새로 들어온 글만 잠깐 강조합니다.
@@ -49,6 +54,7 @@ export default function CommentBoard() {
     if (!msg) return setStatus({ ok: false, msg: "남기실 말을 입력해 주세요." });
     setSending(true);
     try {
+      if (!db) throw new Error("Firebase 설정(.env)이 없습니다.");
       await addDoc(collection(db, "comments"), { text: msg, nickname: nickname.trim() || "익명", createdAt: serverTimestamp() });
       setText("");
       setBurst((b) => b + 1);
@@ -61,15 +67,14 @@ export default function CommentBoard() {
   };
 
   return (
-    <section id="board" className="relative mt-8 overflow-clip rounded-b-[48px] proj-bg text-ink md:mt-14">
-      <div className="pointer-events-none absolute inset-0 opacity-70" aria-hidden="true"><Aurora dark={dark} /></div>
+    <section ref={secRef} id="board" className="relative mt-8 overflow-clip rounded-b-[48px] proj-bg text-ink md:mt-14">
       <div className="relative mx-auto max-w-6xl px-5 py-24 md:py-36">
-      <SectionHead no="04" label="Guestbook" title="방명록" desc="프로젝트나 포트폴리오를 보고 든 생각을 편하게 남겨 주세요." />
+      <SectionHead no="04" label="Guestbook" title="방명록" dot desc="포트폴리오에 대한 의견이나 질문을 남겨 주세요." />
       <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
         <div>
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-accent shadow-[0_10px_24px_-14px_rgba(47,140,255,.6)]"><span aria-hidden="true">💬</span>{comments.length}개의 이야기</p>
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-accent shadow-[0_10px_24px_-14px_rgba(47,140,255,.6)]"><span aria-hidden="true">💬</span>글 {comments.length}개</p>
           <ul data-lenis-prevent className="max-h-[520px] space-y-3 overflow-y-auto pr-1">
-            {comments.length === 0 && <li className="rounded-3xl border border-dashed border-accent/30 bg-white/60 p-10 text-center text-mute">아직 남겨진 글이 없습니다. 첫 번째 글을 남겨 주세요 👋</li>}
+            {comments.length === 0 && <li className="rounded-3xl border border-dashed border-accent/30 bg-white/60 p-10 text-center text-mute">아직 남겨진 글이 없습니다.</li>}
             <AnimatePresence initial={false}>
               {comments.map((c) => (
                 <motion.li key={c.id} layout initial={{ opacity: 0, y: -24, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 26 }} className={`gb-card flex gap-4 rounded-3xl p-5 ring-1 ring-white transition-transform hover:-translate-y-1 ${fresh.has(c.id) ? "gb-fresh" : ""}`}>
@@ -83,10 +88,10 @@ export default function CommentBoard() {
             </AnimatePresence>
           </ul>
         </div>
-        <form onSubmit={submit} className="relative h-fit overflow-hidden rounded-[32px] bg-gradient-to-br from-[#2f8cff] to-[#56c1ff] p-7 text-white shadow-[0_40px_80px_-36px_rgba(47,140,255,.7)] lg:sticky lg:top-28">
+        <form onSubmit={submit} className="relative h-fit overflow-hidden rounded-[32px] bg-gradient-to-br from-[#2f8cff] to-[#2f8cff] p-7 text-white shadow-[0_40px_80px_-36px_rgba(47,140,255,.7)] lg:sticky lg:top-28">
           <span className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/25 blur-3xl" aria-hidden="true" />
-          <h3 className="relative text-2xl font-extrabold tracking-[-0.04em]">한마디 남겨 주세요 ✍️</h3>
-          <p className="relative mt-1 text-sm text-white/80">짧은 한 줄도 큰 힘이 됩니다.</p>
+          <h3 className="relative text-2xl font-extrabold tracking-[-0.04em]">한마디 남기기</h3>
+          <p className="relative mt-1 text-sm text-white/80">이름은 별명으로 적어도 됩니다.</p>
           <input value={nickname} onChange={(e) => setNickname(e.target.value)} maxLength={49} autoComplete="off" aria-label="이름 또는 별명" placeholder="이름 또는 별명" className={`${field} relative mt-5`} />
           <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={499} rows={4} aria-label="남길 말" placeholder="남기고 싶은 말을 입력해 주세요" className={`${field} relative mt-3 resize-none`} />
           <p className="relative mt-1.5 text-right font-mono text-xs tabular-nums text-white/75">{text.length} / 499</p>

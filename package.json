@@ -1,40 +1,32 @@
 {
-  "name": "portfolio",
+  "name": "jingeun-portfolio",
   "private": true,
-  "version": "0.0.0",
+  "version": "6.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.11",
-    "@vercel/analytics": "^1.5.0",
-    "aos": "^2.3.4",
-    "embla-carousel-autoplay": "^8.6.0",
-    "embla-carousel-react": "^8.6.0",
-    "firebase": "^11.10.0",
-    "framer-motion": "^12.23.0",
-    "lenis": "^1.3.27",
-    "lucide-react": "^0.525.0",
-    "motion": "^14.4.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-icons": "^5.5.0",
-    "swiper": "^11.2.10",
-    "tailwindcss": "^4.1.11"
+    "@vercel/analytics": "2.0.1",
+    "embla-carousel-autoplay": "8.6.0",
+    "embla-carousel-react": "8.6.0",
+    "firebase": "13.1.0",
+    "gsap": "^3.12.5",
+    "lenis": "1.3.27",
+    "motion": "14.6.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-icons": "5.7.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react-swc": "^3.10.2",
-    "eslint": "^9.29.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.2.0",
-    "vite": "^7.0.0"
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.5"
   }
 }

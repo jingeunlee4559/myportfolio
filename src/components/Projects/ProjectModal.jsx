@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
-import { FaArrowLeft, FaArrowRight, FaCalendarDays, FaChartPie, FaCheck, FaCirclePlay, FaDesktop, FaGithub, FaImages, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaCalendarDays, FaChartPie, FaCheck, FaChevronDown, FaDesktop, FaGithub, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
 import { projects } from "../../data/projects";
 import { THEMES } from "../../data/themes";
 
@@ -103,6 +103,193 @@ function Gallery({ images, title }) {
   );
 }
 
+/* ───────────── 확대 보기 ───────────── */
+function Zoom({ src, title, onClose }) {
+  return (
+    <AnimatePresence>
+      {src && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} onClick={onClose} className="fixed inset-0 z-[90] grid cursor-zoom-out place-items-center bg-ink/85 modal-bd p-4 backdrop-blur-md md:p-10" role="dialog" aria-modal="true" aria-label="화면 크게 보기">
+          <motion.img initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} src={src} alt={`${title} 확대 화면`} className="max-h-full max-w-full rounded-2xl bg-white object-contain" />
+          <button type="button" onClick={onClose} aria-label="닫기" className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full border border-line bg-[#fff] text-xl leading-none text-[#191f28]">×</button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+const Shot = ({ src, title, onZoom, className = "" }) => (
+  <figure className={`overflow-hidden rounded-2xl border border-line bg-s2 shadow-[0_30px_60px_-36px_rgba(0,0,0,.45)] ${className}`}>
+    <div className="flex h-8 items-center gap-1.5 border-b border-line bg-paper px-3.5" aria-hidden="true">
+      <i className="h-2 w-2 rounded-full bg-[#ff6159]" /><i className="h-2 w-2 rounded-full bg-[#ffbd2e]" /><i className="h-2 w-2 rounded-full bg-[#28c940]" />
+      <span className="ml-2 truncate text-[11px] font-semibold text-mute">{title}</span>
+    </div>
+    <button type="button" onClick={() => onZoom(src)} aria-label={`${title} 화면 크게 보기`} className="group relative block w-full cursor-zoom-in bg-s2">
+      <img src={src} alt={`${title} 화면`} loading="lazy" className="mx-auto block max-h-[70vh] w-full object-contain" />
+      <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-ink/70 px-3 py-1.5 text-xs font-bold text-white opacity-0 backdrop-blur transition group-hover:opacity-100">크게 보기</span>
+    </button>
+  </figure>
+);
+
+/* ───────────── 담당한 기능: 탭으로 고르면 그 기능의 화면과 설명이 보입니다 ───────────── */
+// 탭 줄은 마우스로 잡고 끌거나, 휠·터치패드로 옆으로 넘기거나, 양 끝 화살표로 넘길 수 있어요.
+// 선택한 탭은 항상 가운데로 옵니다. 아래 이전/다음 버튼으로 기능을 하나씩 넘겨 볼 수도 있어요.
+function Features({ items: all }) {
+  // group이 있는 기능(예: Talaria의 비즈니스 모드 / 문화 모드)은 모드별로 나눠 보여줍니다.
+  const groups = [...new Set(all.map((x) => x.group).filter(Boolean))];
+  const [grp, setGrp] = useState(groups[0] ?? null);
+  const items = grp ? all.filter((x) => x.group === grp) : all;
+  const [cur, setCur] = useState(0);
+  useEffect(() => setCur(0), [grp]);
+  const [zoom, setZoom] = useState(null);
+  const [edge, setEdge] = useState({ l: false, r: false });
+  const [shot, setShot] = useState(0); // 기능 안에서 몇 번째 사진인지
+  const tabs = useRef(null);
+  const drag = useRef({ on: false, x: 0, left: 0, moved: false });
+  const f = items[Math.min(cur, items.length - 1)];
+  // 사진은 images 배열(여러 장) 또는 image(한 장) 둘 다 됩니다.
+  const imgs = f.images ?? (f.image ? [f.image] : []);
+  useEffect(() => setShot(0), [cur, grp]);
+
+  // 양 끝에 더 넘길 탭이 있는지 확인 (화살표 표시용)
+  const check = () => {
+    const box = tabs.current; if (!box) return;
+    setEdge({ l: box.scrollLeft > 4, r: box.scrollLeft + box.clientWidth < box.scrollWidth - 4 });
+  };
+  useEffect(() => {
+    const box = tabs.current; if (!box) return;
+    check();
+    const ro = new ResizeObserver(check); ro.observe(box);
+    // 세로 휠을 가로 이동으로 바꿔 줌. 끝에 닿으면 원래대로 창이 위아래로 스크롤돼요.
+    const wheel = (e) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      const max = box.scrollWidth - box.clientWidth;
+      if (max <= 0) return;
+      const next = box.scrollLeft + e.deltaY;
+      if ((e.deltaY < 0 && box.scrollLeft <= 0) || (e.deltaY > 0 && box.scrollLeft >= max)) return;
+      e.preventDefault();
+      box.scrollLeft = Math.max(0, Math.min(max, next));
+    };
+    box.addEventListener("wheel", wheel, { passive: false });
+    return () => { ro.disconnect(); box.removeEventListener("wheel", wheel); };
+  }, []);
+
+  // 선택한 탭이 가운데 오도록
+  useEffect(() => {
+    const box = tabs.current, el = box?.children[cur];
+    if (!box || !el) return;
+    check();
+    const b = box.getBoundingClientRect(), r = el.getBoundingClientRect();
+    box.scrollTo({ left: box.scrollLeft + (r.left - b.left) - (b.width - r.width) / 2, behavior: "smooth" });
+  }, [cur, grp]);
+
+  // 마우스로 잡고 끌기 (터치는 원래 손가락으로 밀 수 있어서 마우스만 처리)
+  const down = (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    drag.current = { on: true, x: e.clientX, left: tabs.current.scrollLeft, moved: false };
+  };
+  const move = (e) => {
+    const d = drag.current; if (!d.on) return;
+    const dx = e.clientX - d.x;
+    if (Math.abs(dx) > 5) d.moved = true;
+    if (d.moved) tabs.current.scrollLeft = d.left - dx;
+  };
+  const up = () => { drag.current.on = false; };
+  // 끌었다 놓은 경우에는 탭이 눌리지 않게
+  const blockClick = (e) => { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); drag.current.moved = false; } };
+  const nudge = (dir) => tabs.current?.scrollBy({ left: dir * tabs.current.clientWidth * 0.7, behavior: "smooth" });
+  const keys = (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); setCur((c) => Math.min(items.length - 1, c + 1)); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); setCur((c) => Math.max(0, c - 1)); }
+  };
+
+  const arrow = "absolute top-0 bottom-1 z-10 flex w-14 items-center";
+  const prev = items[cur - 1], next = items[cur + 1];
+  return (
+    <div>
+      {groups.length > 1 && (
+        <div className="mb-4 inline-flex rounded-full p-1 pm-pill" role="group" aria-label="모드">
+          {groups.map((g) => (
+            <button key={g} type="button" onClick={() => setGrp(g)} aria-pressed={g === grp}
+              className={`rounded-full px-4 py-2 text-[14px] font-extrabold transition ${g === grp ? "pm-solid shadow-[0_8px_18px_-10px_var(--pm-c)]" : "text-mute hover:text-ink"}`}>{g}</button>
+          ))}
+        </div>
+      )}
+      <div className="relative">
+        <div ref={tabs} role="tablist" aria-label="담당한 기능" onScroll={check} onKeyDown={keys}
+          onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up} onClickCapture={blockClick}
+          className={`-mx-1 flex select-none gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${edge.l || edge.r ? "cursor-grab active:cursor-grabbing" : ""}`}>
+          {items.map((it, k) => (
+            <button key={it.heading} type="button" role="tab" aria-selected={k === cur} tabIndex={k === cur ? 0 : -1} onClick={() => setCur(k)} draggable={false}
+              className={`shrink-0 rounded-full px-4 py-2.5 text-[14px] font-bold transition ${k === cur ? "pm-solid shadow-[0_10px_22px_-12px_var(--pm-c)]" : "pm-card text-mute hover:text-ink"}`}>
+              <span className="mr-1.5 font-mono text-[11px] opacity-60">{String(k + 1).padStart(2, "0")}</span>{it.heading}
+            </button>
+          ))}
+        </div>
+        {edge.l && (
+          <div className={`${arrow} left-0 justify-start bg-gradient-to-r from-[var(--pm-fade)] to-transparent`}>
+            <button type="button" onClick={() => nudge(-1)} aria-label="왼쪽 탭 더 보기" className="pm-card grid h-9 w-9 place-items-center rounded-full text-xs shadow-md transition hover:scale-105"><FaArrowLeft aria-hidden="true" /></button>
+          </div>
+        )}
+        {edge.r && (
+          <div className={`${arrow} right-0 justify-end bg-gradient-to-l from-[var(--pm-fade)] to-transparent`}>
+            <button type="button" onClick={() => nudge(1)} aria-label="오른쪽 탭 더 보기" className="pm-card grid h-9 w-9 place-items-center rounded-full text-xs shadow-md transition hover:scale-105"><FaArrowRight aria-hidden="true" /></button>
+          </div>
+        )}
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div key={cur} role="tabpanel" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.3, ease: EASE }} className="mt-5">
+          {imgs.length > 0 && (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div key={imgs[shot]} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Shot src={imgs[shot]} title={`${f.heading}${imgs.length > 1 ? ` (${shot + 1}/${imgs.length})` : ""}`} onZoom={setZoom} />
+                </motion.div>
+              </AnimatePresence>
+              {imgs.length > 1 && (
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]" role="group" aria-label="이 기능의 화면">
+                  {imgs.map((src, k) => (
+                    <button key={src} type="button" onClick={() => setShot(k)} aria-label={`${k + 1}번째 화면 보기`} aria-pressed={k === shot}
+                      className={`relative h-16 w-28 shrink-0 overflow-hidden rounded-xl border-2 bg-s2 transition ${k === shot ? "border-accent opacity-100" : "border-transparent opacity-55 hover:opacity-100"}`}>
+                      <img src={src} alt="" loading="lazy" className="h-full w-full object-cover object-top" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+          <div className={`${imgs.length ? "mt-6" : "mt-1"} grid gap-x-10 gap-y-3 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)]`}>
+            <div>
+              <p className="display text-[13px] font-bold text-accent tabular-nums">{String(cur + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}</p>
+              <h4 className="mt-1 text-[20px] font-extrabold leading-snug tracking-[-0.03em]">{f.heading}</h4>
+            </div>
+            <ul className="space-y-1.5">
+              {f.points.map((s) => <li key={s} className="flex gap-2.5 text-[15px] leading-[1.8] text-ink/75"><i className="mt-[0.75em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" /><span><Rich text={s} /></span></li>)}
+            </ul>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* 이전 / 다음 기능 */}
+      <div className="mt-7 grid grid-cols-2 gap-3">
+        {prev ? (
+          <button type="button" onClick={() => setCur(cur - 1)} className="pm-card group flex min-w-0 items-center gap-3 rounded-2xl px-4 py-3 text-left transition hover:-translate-y-0.5">
+            <FaArrowLeft className="shrink-0 text-xs text-mute transition group-hover:-translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
+            <span className="min-w-0"><span className="block text-[12px] font-bold text-mute">이전 기능</span><span className="block truncate text-[14px] font-extrabold">{prev.heading}</span></span>
+          </button>
+        ) : <span />}
+        {next ? (
+          <button type="button" onClick={() => setCur(cur + 1)} className="pm-card group flex min-w-0 items-center justify-end gap-3 rounded-2xl px-4 py-3 text-right transition hover:-translate-y-0.5">
+            <span className="min-w-0"><span className="block text-[12px] font-bold text-mute">다음 기능</span><span className="block truncate text-[14px] font-extrabold">{next.heading}</span></span>
+            <FaArrowRight className="shrink-0 text-xs text-mute transition group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
+          </button>
+        ) : <span />}
+      </div>
+      <Zoom src={zoom} title={f.heading} onClose={() => setZoom(null)} />
+    </div>
+  );
+}
+
 /* ───────────── 공통 조각 ───────────── */
 const Block = ({ id, no, title, hint, root, children }) => (
   <motion.section id={`pm-${id}`} initial={{ opacity: 0, y: 48 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ root, once: true, margin: "0px 0px -60px 0px" }} transition={{ duration: 0.9, ease: EASE }}>
@@ -173,6 +360,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const prog = useMotionValue(0);
   const bar = useSpring(prog, { stiffness: 140, damping: 30 });
   const [act, setAct] = useState(null);
+  const [allShots, setAllShots] = useState(false);
 
   useEffect(() => {
     if (!p) return;
@@ -183,7 +371,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
     closeRef.current?.focus();
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
   }, [p, onClose]);
-  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); setAct(null); }, [index]);
+  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); setAct(null); setAllShots(false); }, [index]);
 
   const d = p?.details;
   const pos = order?.indexOf(index) ?? -1;
@@ -194,18 +382,9 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const repos = p ? (d.urls?.githubLinks ?? (d.urls?.githubURL ? [{ url: d.urls.githubURL }] : [])) : [];
   const links = p ? [...repos.map((x) => [ROLE_ICON[x.label] ?? FaGithub, x.label ? `GitHub · ${x.label}` : "GitHub", x.url, true]), d.urls?.serviceURL && [FaLink, "배포 사이트", d.urls.serviceURL, false]].filter(Boolean) : [];
   const stats = p ? [[FaCalendarDays, "기간", periodMain, periodNote], [FaUsers, "인원", d.members], [FaUserGear, "내 역할", d.roleShort], d.contribution && [FaChartPie, "기여도", d.contribution, "포트폴리오 기재 기준"]].filter(Boolean) : [];
-  const proofs = p ? [
-    d.award && [FaTrophy, d.award, "수상 기록"],
-    d.modalImages?.length > 0 && [FaImages, `화면 캡처 ${d.modalImages.length}장`, "위 갤러리에서 확인"],
-    d.videoURL && [FaCirclePlay, "시연 영상", "위 영상에서 확인"],
-    ...repos.map((x) => [ROLE_ICON[x.label] ?? FaGithub, x.label ? `GitHub · ${x.label}` : "GitHub 저장소", "눌러서 코드 보기", x.url]),
-  ].filter(Boolean) : [];
-
   // 데이터가 있는 섹션만 번호를 매겨 보여줍니다.
-  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.problems?.length && ["problems", "문제 해결"], d.techReasons?.length && ["tech", "기술 선택"], ["results", "결과"]].filter(Boolean) : [];
+  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.problems?.length && ["problems", "문제 해결"], d.techReasons?.length && ["tech", "기술 선택"], ["results", "결과 요약"], d.techStack?.length && ["stack", "기술 스택"]].filter(Boolean) : [];
   const no = (k) => String(secs.findIndex(([id]) => id === k) + 1).padStart(2, "0");
-  const reasonSet = p ? new Set(d.techReasons?.map((r) => r.tech.toLowerCase())) : new Set();
-  const restTech = p ? d.techStack.filter((t) => ![...reasonSet].some((r) => t.toLowerCase().startsWith(r) || r.startsWith(t.toLowerCase()))) : [];
   const c = p ? THEMES[index].c : "#2f8cff";
   const on = act ?? secs[0]?.[0];
 
@@ -246,18 +425,11 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                   {/* 머리말 */}
                   <motion.div variants={list} initial="hidden" animate="show" className="pm-head relative overflow-hidden px-6 pb-24 pt-9 md:px-12 md:pb-32 md:pt-12">
                     <span className="pointer-events-none absolute -right-2 top-0 select-none display text-[11rem] font-extrabold leading-none tracking-[-0.08em] text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,.34)] md:text-[16rem]" aria-hidden="true">{String(pos + 1).padStart(2, "0")}</span>
-                    <motion.div variants={item} className="relative flex flex-wrap items-center gap-2">
-                      <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 display text-sm font-semibold tabular-nums ring-1 ring-white/30 backdrop-blur">{periodMain}</p>
-                      {periodNote && <p className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold ring-1 ring-white/20">{periodNote}</p>}
-                      {d.award && <p className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-sm font-extrabold text-[#9a6200] shadow-lg"><FaTrophy aria-hidden="true" />{d.award}</p>}
-                    </motion.div>
-                    <motion.h2 variants={item} className="relative mt-5 max-w-4xl text-[clamp(2rem,4.6vw,3.6rem)] font-extrabold leading-[1.13] tracking-[-0.055em]">{d.modalTitle}</motion.h2>
+                    {d.award && <motion.div variants={item} className="relative mb-5 flex flex-wrap items-center gap-2">
+                      <p className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-sm font-extrabold text-[#9a6200] shadow-lg"><FaTrophy aria-hidden="true" />{d.award}</p>
+                    </motion.div>}
+                    <motion.h2 variants={item} className="relative max-w-4xl text-[clamp(2rem,4.6vw,3.6rem)] font-extrabold leading-[1.13] tracking-[-0.055em]">{d.modalTitle}</motion.h2>
                     <motion.p variants={item} className="relative mt-4 max-w-2xl text-[17px] leading-relaxed text-white/85">{d.subtitle}</motion.p>
-                    {d.techStack?.length > 0 && (
-                      <motion.ul variants={item} className="relative mt-6 flex max-w-3xl flex-wrap gap-2" aria-label="사용 기술">
-                        {d.techStack.slice(0, 10).map((t) => <li key={t} className="rounded-full bg-black/15 px-3 py-1 text-[12.5px] font-bold text-white/90 ring-1 ring-white/20 backdrop-blur">{t}</li>)}
-                      </motion.ul>
-                    )}
                     {links.length > 0 && (
                       <motion.div variants={item} className="relative mt-7 flex flex-wrap gap-2">
                         {repos.length > 1 && <p className="w-full text-[13px] font-bold text-white/70">소스 코드 · GitHub 저장소 {repos.length}개</p>}
@@ -268,8 +440,9 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
 
                   {/* 시연 영상 + 큰 화면 갤러리 */}
                   <div className="relative z-10 -mt-16 space-y-5 px-4 md:-mt-24 md:px-10">
-                    {d.videoURL && <video src={d.videoURL} controls preload="none" poster={d.modalImages?.[0]} className="w-full overflow-hidden rounded-3xl border border-line bg-black shadow-[0_40px_80px_-40px_rgba(0,0,0,.55)]" />}
-                    {d.modalImages?.length > 0 && <Gallery key={index} images={d.modalImages} title={d.modalTitle} />}
+                    {d.videoURL
+                      ? <video src={d.videoURL} controls preload="none" poster={d.modalImages?.[0]} className="w-full overflow-hidden rounded-3xl border border-line bg-black shadow-[0_40px_80px_-40px_rgba(0,0,0,.55)]" />
+                      : d.modalImages?.length > 0 && <Gallery key={index} images={d.modalImages} title={d.modalTitle} />}
                   </div>
 
                   {/* 섹션 바로가기 */}
@@ -319,42 +492,33 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                           <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-accent/20 blur-2xl" aria-hidden="true" />
                           <p className="pm-label relative !text-accent">내 역할</p>
                           <p className="relative mt-3 text-[16.5px] font-bold leading-[1.75]">{d.roleSummary}</p>
-                          <p className="pm-label relative mt-6">담당한 기능 {d.myWork.length}개 <span className="font-medium opacity-70">· 눌러서 자세히</span></p>
-                          <ul className="relative mt-3 flex flex-wrap gap-2" aria-label="담당한 기능">
-                            {d.myWork.map((f) => <li key={f.heading}><button type="button" onClick={() => jump("work")} className="pm-chip rounded-xl px-3 py-1.5 text-left text-[13px] font-bold leading-snug transition">{f.heading}</button></li>)}
-                          </ul>
                         </aside>
                       </div>
                     </Block>
 
                     {/* 내가 직접 담당한 기능 */}
-                    <Block root={scroller} id="work" no={no("work")} title="내가 직접 담당한 기능" hint="팀 전체가 아니라, 제가 직접 구현한 부분만 정리했습니다.">
-                      <ul className="grid gap-4 md:grid-cols-2">
-                        {d.myWork.map((f, k) => (
-                          <li key={f.heading} className="pm-card pm-card-hover relative overflow-hidden rounded-3xl p-6 md:p-7">
-                            <span className="pointer-events-none absolute -right-3 -top-5 select-none display text-7xl font-extrabold text-accent/[0.09]" aria-hidden="true">{String(k + 1).padStart(2, "0")}</span>
-                            <div className="relative mb-4 flex items-center gap-3"><span className="pm-solid grid h-8 w-8 place-items-center rounded-xl display text-xs font-bold">{String(k + 1).padStart(2, "0")}</span><i className="h-1 w-8 rounded-full bg-accent/60" aria-hidden="true" /></div>
-                            <b className="relative block text-[17.5px] font-extrabold leading-snug tracking-[-0.02em]">{f.heading}</b>
-                            <ul className="relative mt-3.5 space-y-2.5">
-                              {f.points.map((s) => (
-                                <li key={s} className="flex gap-2.5 text-[14.5px] leading-[1.75] text-ink/70"><i className="mt-[0.7em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" /><span><Rich text={s} /></span></li>
-                              ))}
-                            </ul>
-                          </li>
-                        ))}
-                      </ul>
+                    <Block root={scroller} id="work" no={no("work")} title="내가 직접 담당한 기능">
+                      <Features key={index} items={d.myWork} />
+                      {d.videoURL && d.modalImages?.length > 0 && (
+                        <div className="mt-6">
+                          <button type="button" onClick={() => setAllShots((v) => !v)} aria-expanded={allShots} className="pm-card inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13.5px] font-bold transition hover:-translate-y-0.5">
+                            전체 화면 캡처 {d.modalImages.length}장 {allShots ? "접기" : "보기"}<FaChevronDown className={`text-[11px] transition ${allShots ? "rotate-180" : ""}`} aria-hidden="true" />
+                          </button>
+                          {allShots && <div className="mt-5"><Gallery key={`g-${index}`} images={d.modalImages} title={d.modalTitle} /></div>}
+                        </div>
+                      )}
                     </Block>
 
                     {/* 문제와 해결 */}
                     {d.problems?.length > 0 && (
-                      <Block root={scroller} id="problems" no={no("problems")} title="구현 중 발생한 문제와 해결 과정" hint="문제 상황 → 원인 → 해결 → 결과 순서로 정리했습니다.">
+                      <Block root={scroller} id="problems" no={no("problems")} title="구현 중 발생한 문제와 해결 과정">
                         <div className="space-y-5">{d.problems.map((pb, k) => <Problem key={pb.title} pb={pb} n={k + 1} />)}</div>
                       </Block>
                     )}
 
                     {/* 기술 선택 이유 */}
                     {d.techReasons?.length > 0 && (
-                      <Block root={scroller} id="tech" no={no("tech")} title="기술을 선택한 이유" hint="포트폴리오에 정리한 선택 이유입니다.">
+                      <Block root={scroller} id="tech" no={no("tech")} title="기술을 선택한 이유">
                         <ul className="grid gap-4 md:grid-cols-2">
                           {d.techReasons.map((r) => (
                             <li key={r.tech} className="pm-card pm-card-hover rounded-3xl p-6">
@@ -363,46 +527,27 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                             </li>
                           ))}
                         </ul>
-                        {restTech.length > 0 && (
-                          <>
-                            <h4 className="pm-sub mb-4 mt-10"><i aria-hidden="true" />사용한 그 밖의 기술</h4>
-                            <ul className="flex flex-wrap gap-2">{restTech.map((t) => <li key={t} className="pm-card rounded-full px-3.5 py-1.5 text-[13px] font-bold">{t}</li>)}</ul>
-                          </>
-                        )}
                       </Block>
                     )}
 
-                    {/* 결과와 근거 */}
-                    <Block root={scroller} id="results" no={no("results")} title="구현 결과와 확인 근거" hint="측정하지 않은 성능 개선이나 효과는 적지 않았습니다. 만든 것과 확인할 수 있는 근거만 정리했습니다.">
-                      <ul className="space-y-3">
+                    {/* 결과 요약 */}
+                    <Block root={scroller} id="results" no={no("results")} title="결과 요약">
+                      <ul className="pm-card divide-y divide-ink/[0.07] overflow-hidden rounded-3xl">
                         {d.results.map((r) => (
-                          <li key={r.text} className="pm-card flex gap-4 rounded-3xl p-5 md:p-6">
-                            <span className="pm-solid mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full text-[11px]"><FaCheck aria-hidden="true" /></span>
-                            <div className="min-w-0">
-                              <p className="text-[16px] font-semibold leading-[1.8] text-ink/90"><Rich text={r.text} /></p>
-                              {r.basis && <p className="mt-2.5 inline-flex items-center rounded-full bg-accent/12 px-3 py-1 text-xs font-extrabold text-accent">근거 · {r.basis}</p>}
-                            </div>
+                          <li key={r.text} className="flex gap-4 px-5 py-4 md:px-7 md:py-5">
+                            <span className="pm-solid mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px]"><FaCheck aria-hidden="true" /></span>
+                            <p className="text-[15.5px] font-semibold leading-[1.8] text-ink/90"><Rich text={r.text} /></p>
                           </li>
                         ))}
                       </ul>
-                      {proofs.length > 0 && (
-                        <div className="mt-12">
-                          <h4 className="pm-sub mb-4"><i aria-hidden="true" />확인할 수 있는 곳</h4>
-                          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            {proofs.map(([Icon, label, sub, href]) => {
-                              const inner = (<>
-                                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent ring-1 ring-accent/25"><Icon aria-hidden="true" /></span>
-                                <span className="min-w-0 flex-1"><b className="block text-[14.5px] font-extrabold leading-snug">{label}</b><span className="block text-[12.5px] text-mute">{sub}</span></span>
-                                {href && <FaArrowRight className="shrink-0 text-xs text-mute transition group-hover:translate-x-1 group-hover:text-accent" aria-hidden="true" />}
-                              </>);
-                              return <li key={label}>{href
-                                ? <a href={href} target="_blank" rel="noopener noreferrer" className="pm-card pm-card-hover group flex h-full items-center gap-3.5 rounded-2xl p-4">{inner}</a>
-                                : <div className="pm-card flex h-full items-center gap-3.5 rounded-2xl p-4">{inner}</div>}</li>;
-                            })}
-                          </ul>
-                        </div>
-                      )}
                     </Block>
+
+                    {/* 기술 스택 */}
+                    {d.techStack?.length > 0 && (
+                      <Block root={scroller} id="stack" no={no("stack")} title="기술 스택">
+                        <ul className="flex flex-wrap gap-2">{d.techStack.map((t) => <li key={t} className="pm-card rounded-full px-4 py-2 text-[13.5px] font-bold">{t}</li>)}</ul>
+                      </Block>
+                    )}
 
                     {order && (
                       <motion.div variants={item} className="grid gap-4 md:grid-cols-2">
