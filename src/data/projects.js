@@ -65,7 +65,7 @@ export const projects = [
         { text: "로그인 화면을 구현했습니다.", basis: "화면 캡처" },
         { text: "교육과정 프로젝트 평가에서 **2022 핵심프로젝트 우수상**을 받았습니다.", basis: "수상 기록" },
       ],
-      techStack: ["React", "JavaScript", "Node.js", "MySQL", "KakaoMap API", "Notion", "Slack"],
+      techStack: ["React", "KakaoMap API", "JavaScript", "Node.js", "MySQL"],
     },
   },
 
@@ -144,7 +144,7 @@ export const projects = [
         { text: "신호등과 AI 신호등의 통행량·사고율을 **Chart.js 비교 차트**로 볼 수 있게 했습니다. (화면의 수치는 시연용 데이터이며, 실제 개선 효과를 측정한 것이 아닙니다.)", basis: "화면 캡처" },
         { text: "교육과정 프로젝트 평가에서 **2022 실전프로젝트 최우수상**, **왕중왕전 대상**을 받았습니다.", basis: "수상 기록" },
       ],
-      techStack: ["React", "JavaScript", "Chart.js", "react-table", "KakaoMap API", "Node.js", "MySQL", "Figma"],
+      techStack: ["React", "KakaoMap API", "Chart.js", "react-table", "JavaScript", "Node.js", "MySQL", "Figma"],
     },
   },
 
@@ -213,7 +213,7 @@ export const projects = [
         { text: "베스트 지역 슬라이더, 지역별 맛집 지도, 리뷰 목록까지 **서비스 핵심 화면 4개**를 구현했습니다.", basis: "화면 캡처 · 시연 영상" },
         { text: "맛집 위치와 상세 정보를 지도 오버레이로 바로 확인할 수 있게 했습니다.", basis: "화면 캡처" },
       ],
-      techStack: ["Spring", "Java", "JSP", "JavaScript", "MySQL", "Python", "Maven", "KakaoMap API", "FullCalendar API", "Figma"],
+      techStack: ["Spring", "JSP", "KakaoMap API", "FullCalendar", "Java", "JavaScript", "MySQL", "Python", "Figma"],
     },
   },
 
@@ -313,7 +313,7 @@ export const projects = [
         { text: "챗봇, 카테고리 TOP3/TOP10, 관심상품 추가까지 **탐색 기능**을 구현했습니다.", basis: "화면 캡처 · 시연 영상" },
         { text: "axios 데이터 전송 문제를 **백엔드 데이터 가공 구조**로 바꿔 시각화 컴포넌트가 정상 동작하게 했습니다.", basis: "트러블슈팅 기록" },
       ],
-      techStack: ["React", "Chart.js", "Spring Boot", "Java", "Python", "KcELECTRA", "KoELECTRA NER", "Figma"],
+      techStack: ["React", "Chart.js", "KcELECTRA", "KoELECTRA NER", "Spring Boot", "Java", "Python", "Figma"],
     },
   },
 
@@ -420,7 +420,7 @@ export const projects = [
         { text: "다단계 입력의 상태 유실 문제를 Context API로 해결해, 단계 이동 후에도 입력값이 유지됩니다.", basis: "트러블슈팅 기록" },
         { text: "교육과정 프로젝트 평가에서 **2024 핵심프로젝트 최우수상**을 받았습니다.", basis: "수상 기록" },
       ],
-      techStack: ["React", "Node.js", "MySQL", "Python (FastAPI 연동)", "Figma", "Bootstrap", "KakaoMap API", "FullCalendar", "OpenWeather API"],
+      techStack: ["React", "Node.js", "Python (FastAPI 연동)", "KakaoMap API", "FullCalendar", "OpenWeather API", "MySQL", "Bootstrap", "Figma"],
     },
   },
 
@@ -581,7 +581,7 @@ export const projects = [
         { text: "지도에서 2km 이내 흉기 경보와 근처 경찰서·병원을 확인하고, 알림 내역에서 감지 이미지·녹화 영상을 볼 수 있게 했습니다.", basis: "화면 캡처" },
         { text: "HTTPS 인증서 설정으로 푸시 알림 문제를 해결해 웹·앱 알림 연동을 완성했습니다.", basis: "트러블슈팅 기록" },
       ],
-      techStack: ["React", "Flutter", "Node.js", "WebSocket", "OneSignal", "MySQL", "FastAPI", "YOLOv11", "KakaoMap API", "Bootstrap", "Figma"],
+      techStack: ["React", "Flutter", "WebSocket", "OneSignal", "YOLOv11", "Node.js", "FastAPI", "KakaoMap API", "MySQL", "Bootstrap", "Figma"],
     },
   },
 
@@ -664,7 +664,7 @@ export const projects = [
         { text: "성향 입력 → AI 추천 결과 → 지도 상세 → 맞춤 여행 코스 리포트까지 **프론트엔드 전체 흐름**을 구현했습니다.", basis: "화면 캡처 · 시연 영상" },
         { text: "로그인 여부에 따라 메뉴·페이지 접근이 달라지는 라우팅 구조를 만들었습니다.", basis: "화면 캡처" },
       ],
-      techStack: ["React", "JavaScript", "React-Bootstrap", "KakaoMap API", "FullCalendar", "Spring Boot", "Java 17", "Gradle", "Oracle", "OpenAI Embedding"],
+      techStack: ["React", "KakaoMap API", "FullCalendar", "OpenAI Embedding", "Spring Boot", "Java", "Oracle", "React-Bootstrap", "JavaScript"],
     },
   },
 
@@ -899,7 +899,7 @@ export const projects = [
         { text: "배경 테마 동기화 문제를 DataChannel + State Map 구조로 해결했습니다.", basis: "트러블슈팅 기록" },
         { text: "교육과정 프로젝트 평가에서 **2025 실전프로젝트 우수상**을 받았습니다.", basis: "수상 기록" },
       ],
-      techStack: ["React", "Vite", "JavaScript", "Tailwind CSS", "LiveKit", "Context API", "Axios", "SweetAlert2", "FullCalendar", "react-router-dom", "Figma"],
+      techStack: ["React", "LiveKit", "JavaScript", "Tailwind CSS", "Context API", "react-pdf", "react-dropzone", "FullCalendar", "SweetAlert2", "Figma"],
     },
   },
 ];
