@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "motion/react";
 import ThemeToggle from "./ThemeToggle";
+import MobileMenu from "./MobileMenu";
 import { PROFILE } from "../data/profile";
 import { useDark } from "../lib/theme";
 
@@ -14,6 +15,8 @@ export default function Navs() {
   const [solid, setSolid] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState(null);
+  const [menu, setMenu] = useState(false);
+  const closeMenu = useCallback(() => setMenu(false), []);
   const last = useRef(0);
   const dark = useDark();
   const { scrollYProgress } = useScroll();
@@ -37,8 +40,8 @@ export default function Navs() {
   return (
     <>
       <motion.div className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-accent" style={{ scaleX: w }} aria-hidden="true" />
-      <motion.header initial={false} animate={{ y: hidden ? "-120%" : "0%" }} transition={{ type: "spring", stiffness: 380, damping: 38 }} className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4" onFocusCapture={() => setHidden(false)}>
-        <nav aria-label="주요 메뉴" className={`flex h-14 w-full max-w-4xl items-center justify-between rounded-full pl-6 pr-2 transition-[background,box-shadow] duration-500 ${solid ? (dark ? "bg-[#0f1730]/85 shadow-[0_10px_40px_-14px_rgba(0,0,0,.6)] ring-1 ring-white/10 backdrop-blur-2xl" : "bg-white/80 shadow-[0_10px_40px_-14px_rgba(25,31,40,.3)] ring-1 ring-black/5 backdrop-blur-2xl") : "bg-transparent"}`}>
+      <motion.header initial={false} animate={{ y: hidden && !menu ? "-120%" : "0%" }} transition={{ type: "spring", stiffness: 380, damping: 38 }} className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4" onFocusCapture={() => setHidden(false)}>
+        <nav aria-label="주요 메뉴" className={`${menu ? "nav-open" : ""} flex h-14 w-full max-w-4xl items-center justify-between rounded-full pl-6 pr-2 transition-[background,box-shadow] duration-500 ${solid ? (dark ? "bg-[#0f1730]/85 shadow-[0_10px_40px_-14px_rgba(0,0,0,.6)] ring-1 ring-white/10 backdrop-blur-2xl" : "bg-white/80 shadow-[0_10px_40px_-14px_rgba(25,31,40,.3)] ring-1 ring-black/5 backdrop-blur-2xl") : "bg-transparent"}`}>
           <a href="#top" className="nav-logo flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.03em] text-ink"><i className="grid h-5 w-5 place-items-center rounded-full bg-accent" aria-hidden="true"><b className="h-2 w-2 rounded-full bg-white" /></i><span id="logoText">{PROFILE.name}</span></a>
           <ul className="hidden gap-1 md:flex">
             {links.map(([id, no, label]) => (
@@ -48,9 +51,15 @@ export default function Navs() {
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-2"><ThemeToggle /></div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button type="button" className={`mm-btn md:hidden ${menu ? "on" : ""}`} onClick={() => setMenu((v) => !v)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}>
+              <i /><i />
+            </button>
+          </div>
         </nav>
       </motion.header>
+      <MobileMenu open={menu} onClose={closeMenu} links={links} active={active} />
     </>
   );
 }

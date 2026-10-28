@@ -1194,3 +1194,71 @@ html:not(.gd-live) .ab-row.on .ab-node { background: var(--color-accent); box-sh
 .aw-rank { display: inline-flex; align-items: center; gap: 8px; min-width: 6.4em; }
 .aw-place { flex-shrink: 0; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 0; -webkit-text-fill-color: currentColor; color: color-mix(in srgb, var(--m3) 85%, #000); background: color-mix(in srgb, var(--m2) 26%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m2) 55%, transparent); }
 .dark .aw-place { color: var(--m1); }
+
+/* =====================================================================
+   v6.1 — 휴대폰·태블릿 메뉴
+   ===================================================================== */
+.mm-btn { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 999px; cursor: pointer; background: var(--color-ink); color: var(--st-bg); transition: background .3s, transform .3s; }
+.dark .mm-btn { background: #fff; color: #0a1022; }
+.mm-btn:active { transform: scale(.92); }
+.mm-btn i { position: absolute; left: 13px; right: 13px; height: 2px; border-radius: 2px; background: currentColor; transition: transform .5s cubic-bezier(.16,1,.3,1), width .5s; }
+.mm-btn i:first-child { transform: translateY(-4px); }
+.mm-btn i:last-child { transform: translateY(4px); left: 17px; }
+.mm-btn.on { background: var(--color-accent); color: #fff; }
+.mm-btn.on i:first-child { transform: rotate(45deg); }
+.mm-btn.on i:last-child { transform: rotate(-45deg); left: 13px; }
+.mm { position: fixed; inset: 0; z-index: 48; overflow: hidden; background: radial-gradient(120% 70% at 85% 0%, #1c2a5a 0%, #0b1330 50%, #060a1c 100%); color: #fff; }
+.mm-glow { position: absolute; right: -20%; top: -10%; width: 80vmax; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(47,140,255,.28), transparent 70%); pointer-events: none; }
+.mm-in { position: relative; height: 100%; display: flex; flex-direction: column; padding: calc(96px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom)); overflow-y: auto; }
+.mm-kick { margin: 0 0 14px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .3em; color: #8fc8ff; }
+.mm-list { list-style: none; margin: 0; padding: 0; }
+.mm-li { overflow: hidden; border-bottom: 1px solid rgba(255,255,255,.1); }
+.mm-item { display: flex; align-items: center; gap: 16px; width: 100%; padding: clamp(14px, 2.6vh, 22px) 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.mm-no { align-self: flex-start; padding-top: .55em; font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,.45); }
+.mm-txt { display: grid; gap: 4px; flex: 1; min-width: 0; }
+.mm-txt b { display: inline-flex; align-items: baseline; font-size: clamp(34px, 10vw, 52px); font-weight: 800; letter-spacing: -.06em; line-height: 1.05; transition: color .3s; }
+.mm-txt small { font-size: 13.5px; color: rgba(220,232,255,.6); }
+.mm-item.on .mm-txt b { color: #8fc8ff; }
+.mm-dot { display: inline-block; width: .2em; height: .2em; margin-left: .08em; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 16px rgba(47,140,255,.9); }
+.mm-arrow { font-size: 16px; color: rgba(255,255,255,.4); transition: transform .4s cubic-bezier(.16,1,.3,1), color .3s; }
+.mm-item:active .mm-arrow, .mm-item:hover .mm-arrow { transform: translateX(6px); color: #fff; }
+.mm-foot { margin-top: auto; padding-top: 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+.mm-foot a { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: #fff; text-decoration: none; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+/* 메뉴가 열려 있으면 상단 바 위에 겹쳐 보이도록 바를 투명 배경 위로 */
+@media (min-width: 768px) { .mm { display: none; } }
+.nav-open { background: transparent !important; box-shadow: none !important; --tw-ring-shadow: 0 0 #0000 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.nav-open .nav-logo, .nav-open #logoText { color: #fff !important; }
+
+/* =====================================================================
+   v6.2 — 휴대폰 메뉴: 라이트 / 다크 색 따로, 메뉴 버튼 꾸미기
+   ===================================================================== */
+/* 메뉴 버튼 공통: 둥근 버튼 + 은은한 빛, 누르면 X */
+.mm-btn { overflow: hidden; transition: background .4s, box-shadow .4s, transform .3s; }
+.mm-btn::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%); background-size: 250% 100%; background-position: 150% 0; transition: background-position .8s; pointer-events: none; }
+.mm-btn:hover::before { background-position: -60% 0; }
+.mm-btn i { z-index: 1; }
+
+/* 라이트: 파란 그라데이션 버튼 + 흰 선 */
+html:not(.dark) .mm-btn { background: linear-gradient(135deg, #2f8cff 0%, #4f6bff 100%); color: #fff; box-shadow: 0 8px 20px -8px rgba(47,110,255,.75), inset 0 1px 0 rgba(255,255,255,.35); }
+html:not(.dark) .mm-btn.on { background: linear-gradient(135deg, #0f1629, #24304f); box-shadow: 0 8px 20px -8px rgba(15,22,41,.6); }
+/* 다크: 유리 같은 반투명 버튼 + 흰 선, 열면 파랑 */
+.dark .mm-btn { background: rgba(255,255,255,.08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 8px 24px -10px rgba(47,140,255,.6); }
+.dark .mm-btn:hover { background: rgba(255,255,255,.14); }
+.dark .mm-btn.on { background: linear-gradient(135deg, #2f8cff, #4f6bff); box-shadow: 0 0 0 1px rgba(143,200,255,.4), 0 10px 28px -8px rgba(47,140,255,.85); }
+
+/* 라이트 메뉴 판: 밝은 하늘빛 바탕 + 진한 남색 글자 */
+html:not(.dark) .mm { background: radial-gradient(120% 70% at 85% 0%, #dcebff 0%, #f3f7ff 45%, #ffffff 100%); color: #0f1629; }
+html:not(.dark) .mm-glow { background: radial-gradient(closest-side, rgba(47,140,255,.18), transparent 70%); }
+html:not(.dark) .mm::after { content: ""; position: absolute; left: -15%; bottom: -10%; width: 70vmax; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(124,92,255,.10), transparent 70%); pointer-events: none; }
+html:not(.dark) .mm-kick { color: var(--color-accent); }
+html:not(.dark) .mm-li { border-bottom-color: rgba(15,22,41,.08); }
+html:not(.dark) .mm-no { color: rgba(15,22,41,.4); }
+html:not(.dark) .mm-txt small { color: #5b6476; }
+html:not(.dark) .mm-item.on .mm-txt b { color: var(--color-accent); }
+html:not(.dark) .mm-arrow { color: rgba(15,22,41,.3); }
+html:not(.dark) .mm-item:active .mm-arrow, html:not(.dark) .mm-item:hover .mm-arrow { color: var(--color-accent); }
+html:not(.dark) .mm-foot a { color: #0f1629; background: #fff; box-shadow: 0 0 0 1px rgba(15,22,41,.08), 0 10px 24px -16px rgba(30,60,130,.45); }
+/* 다크 메뉴 판: 남색 밤하늘 + 작은 별 */
+.dark .mm::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(1.2px 1.2px at 18% 22%, rgba(214,235,255,.7), transparent), radial-gradient(1px 1px at 72% 14%, rgba(255,255,255,.6), transparent), radial-gradient(1.4px 1.4px at 86% 58%, rgba(214,235,255,.5), transparent), radial-gradient(1px 1px at 10% 74%, rgba(255,255,255,.5), transparent), radial-gradient(1.2px 1.2px at 52% 88%, rgba(214,235,255,.5), transparent); }
+/* 메뉴가 열리면 상단 바 로고: 라이트는 남색, 다크는 흰색 */
+html:not(.dark) .nav-open .nav-logo, html:not(.dark) .nav-open #logoText { color: #0f1629 !important; }
