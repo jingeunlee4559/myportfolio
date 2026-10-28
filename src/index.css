@@ -1262,3 +1262,5 @@ html:not(.dark) .mm-foot a { color: #0f1629; background: #fff; box-shadow: 0 0 0
 .dark .mm::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(1.2px 1.2px at 18% 22%, rgba(214,235,255,.7), transparent), radial-gradient(1px 1px at 72% 14%, rgba(255,255,255,.6), transparent), radial-gradient(1.4px 1.4px at 86% 58%, rgba(214,235,255,.5), transparent), radial-gradient(1px 1px at 10% 74%, rgba(255,255,255,.5), transparent), radial-gradient(1.2px 1.2px at 52% 88%, rgba(214,235,255,.5), transparent); }
 /* 메뉴가 열리면 상단 바 로고: 라이트는 남색, 다크는 흰색 */
 html:not(.dark) .nav-open .nav-logo, html:not(.dark) .nav-open #logoText { color: #0f1629 !important; }
+/* 메뉴 버튼은 휴대폰(768px 미만)에서만. 넓은 화면은 상단 바에 메뉴가 바로 보임 */
+@media (min-width: 768px) { .mm-btn { display: none !important; } }
