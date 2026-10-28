@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
-import { FaArrowLeft, FaArrowRight, FaCalendarDays, FaChartPie, FaCheck, FaChevronDown, FaDesktop, FaGithub, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaArrowsRotate, FaCalendarDays, FaChartPie, FaCheck, FaChevronDown, FaDesktop, FaGithub, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
 import { projects } from "../../data/projects";
 import { THEMES } from "../../data/themes";
 
@@ -313,6 +313,34 @@ const STEP = {
   solution: ["해결 방법", FaWrench, "accent"],
 };
 
+// 요구사항이 바뀌었을 때 어떻게 대응했는지: 언제·왜 → 대응 → 결과
+const CSTEP = [["situation", "상황", FaArrowsRotate, "accent"], ["response", "대응", FaWrench, "sun"], ["result", "결과", FaCheck, "mint"]];
+function Collab({ cb }) {
+  return (
+    <article className="pm-card overflow-hidden rounded-3xl">
+      <header className="flex flex-wrap items-center gap-3 border-b border-line bg-accent/[0.06] px-6 py-5 md:px-8">
+        <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-white">{cb.tag ?? "요구사항 변경"}</span>
+        <h4 className="text-lg font-extrabold leading-snug tracking-[-0.025em] md:text-xl">{cb.title}</h4>
+        {cb.when && <span className="ml-auto rounded-full bg-ink/5 px-3 py-1 text-[12.5px] font-bold text-mute">{cb.when}</span>}
+      </header>
+      <ol className="relative space-y-6 px-6 py-7 md:px-8">
+        <i className="absolute bottom-12 left-[calc(1.5rem+17px)] top-12 w-px bg-ink/10 md:left-[calc(2rem+17px)]" aria-hidden="true" />
+        {CSTEP.map(([key, label, Icon, tone]) => cb[key] && (
+          <li key={key} className="relative flex gap-4">
+            <span className={`z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm ${TONE[tone]}`}><Icon aria-hidden="true" /></span>
+            <div className="min-w-0 pt-0.5">
+              <p className={`w-fit rounded-full px-3 py-0.5 text-[12.5px] font-extrabold ${TONE[tone]}`}>{label}</p>
+              {Array.isArray(cb[key])
+                ? <ul className="mt-2 space-y-1.5">{cb[key].map((t) => <li key={t} className="flex gap-2.5 text-[15.5px] leading-[1.75] text-ink/85"><span className="mt-[0.7em] h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-40" aria-hidden="true" /><span><Rich text={t} /></span></li>)}</ul>
+                : <p className="mt-2 text-[15.5px] leading-[1.85] text-ink/85"><Rich text={cb[key]} /></p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </article>
+  );
+}
+
 function Problem({ pb, n }) {
   return (
     <article className="pm-card overflow-hidden rounded-3xl">
@@ -383,7 +411,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const links = p ? [...repos.map((x) => [ROLE_ICON[x.label] ?? FaGithub, x.label ? `GitHub · ${x.label}` : "GitHub", x.url, true]), d.urls?.serviceURL && [FaLink, "배포 사이트", d.urls.serviceURL, false]].filter(Boolean) : [];
   const stats = p ? [[FaCalendarDays, "기간", periodMain, periodNote], [FaUsers, "인원", d.members], [FaUserGear, "내 역할", d.roleShort], d.contribution && [FaChartPie, "기여도", d.contribution, "포트폴리오 기재 기준"]].filter(Boolean) : [];
   // 데이터가 있는 섹션만 번호를 매겨 보여줍니다.
-  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.problems?.length && ["problems", "문제 해결"], d.techReasons?.length && ["tech", "기술 선택"], ["results", "결과 요약"], d.techStack?.length && ["stack", "기술 스택"]].filter(Boolean) : [];
+  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.collab?.length && ["collab", "요구사항 대응"], d.problems?.length && ["problems", "문제 해결"], d.techReasons?.length && ["tech", "기술 선택"], ["results", "결과 요약"], d.techStack?.length && ["stack", "기술 스택"]].filter(Boolean) : [];
   const no = (k) => String(secs.findIndex(([id]) => id === k) + 1).padStart(2, "0");
   const c = p ? THEMES[index].c : "#2f8cff";
   const on = act ?? secs[0]?.[0];
@@ -508,6 +536,13 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                         </div>
                       )}
                     </Block>
+
+                    {/* 협업 · 요구사항 대응 */}
+                    {d.collab?.length > 0 && (
+                      <Block root={scroller} id="collab" no={no("collab")} title="협업과 요구사항 대응">
+                        <div className="space-y-5">{d.collab.map((cb) => <Collab key={cb.title} cb={cb} />)}</div>
+                      </Block>
+                    )}
 
                     {/* 문제와 해결 */}
                     {d.problems?.length > 0 && (
