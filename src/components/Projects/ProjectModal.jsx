@@ -130,6 +130,37 @@ const Shot = ({ src, title, onZoom, className = "" }) => (
   </figure>
 );
 
+/* ───────────── 사진이 없는 기능(백엔드 · API)은 탭 대신 카드로 한꺼번에 보여줍니다 ───────────── */
+function ApiCards({ items, label }) {
+  return (
+    <div>
+      <p className="mb-4 flex items-center gap-2 text-[13.5px] font-bold text-mute">
+        <span className="pm-solid grid h-6 w-6 place-items-center rounded-lg text-[11px]"><FaServer aria-hidden="true" /></span>
+        {label} 기능 {items.length}개 <span className="text-mute/60">· 한눈에 보기</span>
+      </p>
+      <ul className="grid gap-4 md:grid-cols-2">
+        {items.map((it, k) => (
+          <motion.li key={it.heading} initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: EASE, delay: k * 0.06 }}
+            className="pm-api pm-card relative overflow-hidden rounded-3xl p-6 pt-7 md:p-7 md:pt-8 md:[&:last-child:nth-child(odd)]:col-span-2">
+            <span className="pm-api-no" aria-hidden="true">{String(k + 1).padStart(2, "0")}</span>
+            <div className="relative flex items-center gap-3">
+              <span className="pm-solid grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-[15px] shadow-[0_10px_22px_-12px_var(--pm-c)]"><FaServer aria-hidden="true" /></span>
+              <h4 className="min-w-0 text-[18px] font-extrabold leading-snug tracking-[-0.03em]">{it.heading}</h4>
+            </div>
+            <ul className="relative mt-5 space-y-2.5">
+              {it.points.map((s) => (
+                <li key={s} className="flex gap-2.5 text-[14.5px] leading-[1.75] text-ink/75">
+                  <FaCheck className="mt-[0.62em] shrink-0 text-[10px] text-accent" aria-hidden="true" /><span><Rich text={s} /></span>
+                </li>
+              ))}
+            </ul>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /* ───────────── 담당한 기능: 탭으로 고르면 그 기능의 화면과 설명이 보입니다 ───────────── */
 // 탭 줄은 마우스로 잡고 끌거나, 휠·터치패드로 옆으로 넘기거나, 양 끝 화살표로 넘길 수 있어요.
 // 선택한 탭은 항상 가운데로 옵니다. 아래 이전/다음 버튼으로 기능을 하나씩 넘겨 볼 수도 있어요.
@@ -146,6 +177,8 @@ function Features({ items: all }) {
   const tabs = useRef(null);
   const drag = useRef({ on: false, x: 0, left: 0, moved: false });
   const f = items[Math.min(cur, items.length - 1)];
+  // 사진이 하나도 없는 묶음(예: 백엔드)은 탭 대신 카드로 한꺼번에 보여줍니다.
+  const cardMode = items.length > 0 && items.every((x) => !(x.images?.length || x.image));
   // 사진은 images 배열(여러 장) 또는 image(한 장) 둘 다 됩니다.
   const imgs = f.images ?? (f.image ? [f.image] : []);
   useEffect(() => setShot(0), [cur, grp]);
@@ -214,6 +247,8 @@ function Features({ items: all }) {
           ))}
         </div>
       )}
+      {cardMode && <ApiCards items={items} label={grp ?? "담당"} />}
+      <div className={cardMode ? "hidden" : ""}>
       <div className="relative">
         <div ref={tabs} role="tablist" aria-label="담당한 기능" onScroll={check} onKeyDown={keys}
           onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={up} onClickCapture={blockClick}
@@ -284,6 +319,7 @@ function Features({ items: all }) {
             <FaArrowRight className="shrink-0 text-xs text-mute transition group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true" />
           </button>
         ) : <span />}
+      </div>
       </div>
       <Zoom src={zoom} title={f.heading} onClose={() => setZoom(null)} />
     </div>

@@ -307,6 +307,11 @@ html.dark body::after { mix-blend-mode: screen; opacity: .035; }
 .dark .pm-pill-on, .dark .pm-pill-on:hover { background: var(--pm-c); color: var(--pm-fg, #fff); }
 
 /* ============ v2 정리: 네비 숨김, 기능별 이미지 ============ */
+/* 백엔드 · API 카드 */
+.pm-api { transition: transform .5s cubic-bezier(.16,1,.3,1), border-color .3s, box-shadow .5s; }
+.pm-api::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, var(--pm-c), color-mix(in srgb, var(--pm-c) 25%, transparent)); }
+.pm-api:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--pm-c) 45%, transparent); box-shadow: 0 30px 56px -32px color-mix(in srgb, var(--pm-c) 55%, transparent); }
+.pm-api-no { position: absolute; right: 20px; top: 10px; font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -.06em; color: color-mix(in srgb, var(--pm-c) 11%, transparent); pointer-events: none; user-select: none; }
 .pm-feat-on { border-color: var(--pm-c) !important; box-shadow: 0 0 0 1px var(--pm-c), 0 30px 60px -34px color-mix(in srgb, var(--pm-c) 60%, transparent); }
 
 /* =====================================================================

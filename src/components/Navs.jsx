@@ -55,7 +55,7 @@ export default function Navs() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* 연락처: 어디서든 바로 메일·GitHub로 갈 수 있게 */}
             {PROFILE.email && <a href={`mailto:${PROFILE.email}`} className="nav-ic" aria-label={`메일 보내기: ${PROFILE.email}`} data-cursor="메일"><FaEnvelope aria-hidden="true" /></a>}
-            <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="nav-ic" aria-label="GitHub 열기" data-cursor="GitHub"><FaGithub aria-hidden="true" /></a>
+            <a href={PROFILE.githubPortfolio} target="_blank" rel="noopener noreferrer" className="nav-ic" aria-label="GitHub 열기" data-cursor="GitHub"><FaGithub aria-hidden="true" /></a>
             <ThemeToggle />
             <button type="button" className={`mm-btn md:hidden ${menu ? "on" : ""}`} onClick={() => setMenu((v) => !v)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}>
               <i /><i />

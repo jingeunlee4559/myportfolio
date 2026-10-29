@@ -52,7 +52,7 @@ export default function MobileMenu({ open, onClose, links, active }) {
             </ul>
             <motion.div className="mm-foot" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.7, ease: EASE }}>
               {PROFILE.email && <a href={`mailto:${PROFILE.email}`}><FaEnvelope aria-hidden="true" />{PROFILE.email}</a>}
-              <a href={PROFILE.github} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
+              <a href={PROFILE.githubPortfolio} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
             </motion.div>
           </nav>
         </motion.div>

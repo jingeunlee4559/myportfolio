@@ -5,7 +5,7 @@ export const PROFILE = {
   nameEn: "Jingeun Lee",
   role: "Web Developer",
   github: "https://github.com/jingeunlee4559",
-  githubPortfolio: "https://github.com/jingeunlee4559/myportfolio", // 히어로·푸터의 GitHub 버튼
+  githubPortfolio: "https://github.com/jingeunlee4559/portfolio", // 메뉴바·히어로·푸터의 GitHub 버튼
   email: "wlsrms4559@gmail.com",
   resume: "", // 이력서 PDF를 public/ 에 넣고 경로를 적으면 "이력서 보기" 버튼이 생깁니다. 예: "/resume.pdf"
 };

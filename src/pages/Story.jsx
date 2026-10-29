@@ -198,7 +198,7 @@ export default function Story() {
         </h1>
         <div className="st-cta">
           <button type="button" className="st-btn st-btn-w" onClick={() => window.dispatchEvent(new Event("goto-project"))}>프로젝트 보기 <FaArrowRight aria-hidden="true" /></button>
-          <a className="st-btn st-btn-o" href={PROFILE.github} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
+          <a className="st-btn st-btn-o" href={PROFILE.githubPortfolio} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
           {PROFILE.email && <MailLine email={PROFILE.email} />}
         </div>
       </div>
