@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaBell } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 import { guideZone } from "../lib/guide";
 import { WEBAPP as D, FEATURED } from "../data/story";
 

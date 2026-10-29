@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 import { projects } from "../data/projects";
 import { THEMES } from "../data/themes";
 import { FEATURED } from "../data/story";

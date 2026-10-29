@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, ScrollTrigger, NARROW_MQ, sortTriggers } from "../lib/gsap";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 import { guideZone } from "../lib/guide";
 import { projects } from "../data/projects";
 import { THEMES } from "../data/themes";
@@ -54,7 +54,7 @@ export default function MoreProjects() {
       <div className="acc-stage">
         <div className="acc-head">
           <p className="st-kicker">MORE PROJECTS · {MORE.length}</p>
-          <h2 className="acc-title">그 밖의 프로젝트도<br />끝까지 만들었습니다<i className="gd-p" aria-hidden="true" /></h2>
+          <h2 className="acc-title">그 밖의 프로젝트도<br />불편을 찾는 데서 시작했습니다<i className="gd-p" aria-hidden="true" /></h2>
         </div>
         <div className="acc-row" onPointerLeave={() => { hover.current = false; }}>
           {MORE.map(({ idx, img, short }, i) => {

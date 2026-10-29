@@ -5,3 +5,7 @@ export const reduced = typeof window !== "undefined" && window.matchMedia("(pref
 export const INTRO_ON = false;
 export const D0 = 0;
 export const EASE = [0.16, 1, 0.3, 1];
+
+// 스크롤 장면은 사용자가 직접 스크롤해서 움직이는 것이라, '동작 줄이기' 설정이 켜져 있어도 그대로 씁니다.
+// (예전에는 이 설정이면 장면을 끄고 정적 화면으로 바꿨는데, 레이아웃이 겹치는 문제가 있었습니다.)
+export const STATIC_LAYOUT = false;

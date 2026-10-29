@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { layers } from "../data/skills";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 
 // 기술 — 세 번째 장(CHAPTER 03): 밤하늘 별자리
 //  ① 밝은 화면 위로 남색 카드가 올라와 화면을 꽉 채우며 밤하늘이 됨 (인트로의 밤하늘과 이어짐)

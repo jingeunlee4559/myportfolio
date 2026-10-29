@@ -207,10 +207,10 @@ function Features({ items: all }) {
   return (
     <div>
       {groups.length > 1 && (
-        <div className="mb-4 inline-flex rounded-full p-1 pm-pill" role="group" aria-label="모드">
+        <div className="mb-4 inline-flex max-w-full overflow-x-auto rounded-full p-1 pm-pill [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="모드">
           {groups.map((g) => (
             <button key={g} type="button" onClick={() => setGrp(g)} aria-pressed={g === grp}
-              className={`rounded-full px-4 py-2 text-[14px] font-extrabold transition ${g === grp ? "pm-solid shadow-[0_8px_18px_-10px_var(--pm-c)]" : "text-mute hover:text-ink"}`}>{g}</button>
+              className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 text-[13.5px] font-extrabold transition sm:px-4 sm:text-[14px] ${g === grp ? "pm-solid shadow-[0_8px_18px_-10px_var(--pm-c)]" : "text-mute hover:text-ink"}`}>{g}</button>
           ))}
         </div>
       )}
@@ -381,6 +381,74 @@ function Problem({ pb, n }) {
   );
 }
 
+
+// 프로젝트 소개: 배경 → 해결 → 결과 세 문단 (문단이 셋이 아니면 그냥 문단으로)
+const INTRO_LABEL = ["배경", "해결", "결과"];
+function Intro({ text = "" }) {
+  const paras = text.split("\n\n");
+  const v = (typeof window !== "undefined" && window.__introV) || "A";
+  if (paras.length !== 3) return <div className="max-w-3xl space-y-4">{paras.map((t) => <p key={t} className="text-[1.08rem] font-semibold leading-[1.9]"><Rich text={t} /></p>)}</div>;
+  if (v === "B") return (
+    <ol className="pm-flow grid gap-3 lg:grid-cols-3 lg:gap-4">
+      {paras.map((t, k) => (
+        <li key={k} className={`relative rounded-3xl p-6 md:p-7 ${k === 2 ? "pm-role" : "pm-card"}`}>
+          <p className="pm-label !text-accent">{String(k + 1).padStart(2, "0")} · {INTRO_LABEL[k]}</p>
+          <p className="mt-3 text-[15.5px] font-medium leading-[1.85] text-ink/80 [&_strong]:font-bold [&_strong]:text-ink [&_b]:font-bold [&_b]:text-ink"><Rich text={t} /></p>
+          {k < 2 && <span className="pm-flow-arrow" aria-hidden="true"><FaArrowRight /></span>}
+        </li>
+      ))}
+    </ol>
+  );
+  return (
+    <dl className="max-w-3xl">
+      {paras.map((t, k) => (
+        <div key={k} className={`grid gap-1.5 py-5 md:grid-cols-[64px_1fr] md:gap-6 ${k === 2 ? "pm-role -mx-5 mt-3 rounded-3xl px-5 md:-mx-7 md:px-7" : "border-b border-ink/[0.07]"} ${k === 0 ? "pt-0" : ""}`}>
+          <dt className="pm-label !text-accent md:pt-[0.35em]">{INTRO_LABEL[k]}</dt>
+          <dd className="m-0 text-[1.06rem] font-medium leading-[1.9] tracking-[-0.015em] text-ink/80 [&_strong]:font-bold [&_strong]:text-ink [&_b]:font-bold [&_b]:text-ink"><Rich text={t} /></dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+
+// 소개 칸(새 형식): 핵심 한 줄 → 개요 → 불편·해결 → 성과
+const Tech = ({ list }) => list?.length > 0 && <ul className="pm-st-tech">{list.map((x) => <li key={x}>{x}</li>)}</ul>;
+function Story({ st, award }) {
+  return (
+    <div className="pm-st">
+      <div className="pm-st-top1">
+        <p className="pm-st-h">{st.headline}<span className="text-accent">.</span></p>
+        <div>
+          <p className="pm-label !text-accent">개요</p>
+          <p className="mt-2.5 text-[1.02rem] font-medium leading-[1.85] text-ink/75">{st.summary}</p>
+        </div>
+      </div>
+      <ol className="pm-cd pm-card">
+        {st.pairs.map((pr, k) => (
+          <li key={pr.problem} className="pm-cd-row">
+            <span className="pm-cd-no pm-solid">{k + 1}</span>
+            <div className="min-w-0">
+              <p className="pm-cd-p"><span className="sr-only">불편: </span>{pr.problem}</p>
+              <div className="pm-cd-s">
+                <FaArrowRight className="pm-cd-ar" aria-hidden="true" />
+                <div className="min-w-0"><p><span className="sr-only">해결: </span><Rich text={pr.solution} /></p><Tech list={pr.tech} /></div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div className="pm-st-out">
+        <div>
+          <p className="pm-label !text-accent">성과</p>
+          <p className="mt-2 text-[1.04rem] font-semibold leading-[1.8]"><Rich text={st.outcome} /></p>
+        </div>
+        {award && <p className="pm-st-award"><FaTrophy aria-hidden="true" />{award}</p>}
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectModal({ index, onClose, onChange, order }) {
   const p = index == null ? null : projects[index];
   const closeRef = useRef(null);
@@ -411,7 +479,8 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const links = p ? [...repos.map((x) => [ROLE_ICON[x.label] ?? FaGithub, x.label ? `GitHub · ${x.label}` : "GitHub", x.url, true]), d.urls?.serviceURL && [FaLink, "배포 사이트", d.urls.serviceURL, false]].filter(Boolean) : [];
   const stats = p ? [[FaCalendarDays, "기간", periodMain, periodNote], [FaUsers, "인원", d.members], [FaUserGear, "내 역할", d.roleShort], d.contribution && [FaChartPie, "기여도", d.contribution, "포트폴리오 기재 기준"]].filter(Boolean) : [];
   // 데이터가 있는 섹션만 번호를 매겨 보여줍니다.
-  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.collab?.length && ["collab", "요구사항 대응"], d.problems?.length && ["problems", "문제 해결"], d.techReasons?.length && ["tech", "기술 선택"], ["results", "결과 요약"], d.techStack?.length && ["stack", "기술 스택"]].filter(Boolean) : [];
+  const st = p ? d.story : null;
+  const secs = p ? [["intro", "소개"], ["work", "담당 기능"], d.collab?.length && ["collab", "요구사항 대응"], d.problems?.length && ["problems", "문제 해결"], !st && d.techReasons?.length && ["tech", "기술 선택"], !st && ["results", "결과 요약"], d.techStack?.length && ["stack", "기술 스택"]].filter(Boolean) : [];
   const no = (k) => String(secs.findIndex(([id]) => id === k) + 1).padStart(2, "0");
   const c = p ? THEMES[index].c : "#2f8cff";
   const on = act ?? secs[0]?.[0];
@@ -514,14 +583,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
 
                     {/* 소개 + 내 역할 */}
                     <Block root={scroller} id="intro" no={no("intro")} title="프로젝트 소개">
-                      <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
-                        <p className="text-[1.1rem] font-semibold leading-[1.9] tracking-[-0.015em]"><Rich text={d.overview} /></p>
-                        <aside className="pm-role relative overflow-hidden rounded-3xl p-6 md:p-7">
-                          <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-accent/20 blur-2xl" aria-hidden="true" />
-                          <p className="pm-label relative !text-accent">내 역할</p>
-                          <p className="relative mt-3 text-[16.5px] font-bold leading-[1.75]">{d.roleSummary}</p>
-                        </aside>
-                      </div>
+                      {d.story ? <Story st={d.story} award={d.award} /> : <Intro text={d.overview} />}
                     </Block>
 
                     {/* 내가 직접 담당한 기능 */}
@@ -552,7 +614,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                     )}
 
                     {/* 기술 선택 이유 */}
-                    {d.techReasons?.length > 0 && (
+                    {!st && d.techReasons?.length > 0 && (
                       <Block root={scroller} id="tech" no={no("tech")} title="기술을 선택한 이유">
                         <ul className="grid gap-4 md:grid-cols-2">
                           {d.techReasons.map((r) => (
@@ -566,7 +628,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                     )}
 
                     {/* 결과 요약 */}
-                    <Block root={scroller} id="results" no={no("results")} title="결과 요약">
+                    {!st && <Block root={scroller} id="results" no={no("results")} title="결과 요약">
                       <ul className="pm-card divide-y divide-ink/[0.07] overflow-hidden rounded-3xl">
                         {d.results.map((r) => (
                           <li key={r.text} className="flex gap-4 px-5 py-4 md:px-7 md:py-5">
@@ -575,12 +637,25 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                           </li>
                         ))}
                       </ul>
-                    </Block>
+                    </Block>}
 
                     {/* 기술 스택 */}
                     {d.techStack?.length > 0 && (
                       <Block root={scroller} id="stack" no={no("stack")} title="기술 스택">
                         <ul className="flex flex-wrap gap-2">{d.techStack.map((t) => <li key={t} className="pm-card rounded-full px-4 py-2 text-[13.5px] font-bold">{t}</li>)}</ul>
+                        {st && d.techReasons?.length > 0 && (
+                          <div className="mt-9">
+                            <h4 className="pm-why-h"><i aria-hidden="true" />기술 선택 포인트</h4>
+                            <ul className="pm-why pm-card">
+                              {d.techReasons.map((r, k) => (
+                                <li key={r.tech} className="pm-why-row">
+                                  <span className="pm-why-t"><i className="pm-solid" aria-hidden="true">{k + 1}</i>{r.tech}</span>
+                                  <p>{r.reason.replace(/\s*\(팀 기술 선택\)/, "")}{/\(팀 기술 선택\)/.test(r.reason) && <em>팀 선택</em>}</p>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </Block>
                     )}
 

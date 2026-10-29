@@ -5,7 +5,7 @@ import { PROFILE, INTRO, EDUCATION, AWARDS } from "../data/profile";
 import { CHAPTERS, MORE } from "../data/story";
 import { gsap } from "../lib/gsap";
 import { guideTrack } from "../lib/guide";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 
 // 소개 — 프로젝트 이야기에서 이어지는 두 번째 장(CHAPTER 02)
 //  ① 장 제목 "저를 소개합니다." + 옆으로 그어지는 가는 선

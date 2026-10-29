@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { FaArrowRight, FaGithub } from "react-icons/fa6";
+import { FaArrowRight, FaEnvelope, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef, narrow } from "../lib/gsap";
-import { reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced } from "../lib/env";
 import { guide, guideZone } from "../lib/guide";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
@@ -33,6 +33,20 @@ const PIN = () => (isMobile() ? 3.1 : 3.6);
 // JS는 그 자리를 읽어 오기만 하므로, 화면 크기가 바뀌어도 CSS가 정한 자리로 다시 맞춰집니다.
 const E = gsap.parseEase("power2.inOut");
 const mix = (p, q, t) => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t, w: p.w + (q.w - p.w) * t, h: p.h + (q.h - p.h) * t });
+
+// 메일 주소 한 줄: 누르면 주소가 복사되고 "복사됨"이 잠깐 보입니다. 옆 아이콘은 메일 앱 열기.
+function MailLine({ email }) {
+  const [done, setDone] = useState(false);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(email); setDone(true); setTimeout(() => setDone(false), 1600); }
+    catch { window.location.href = `mailto:${email}`; }
+  };
+  return (
+    <p className="st-mail">
+      <button type="button" onClick={copy} data-cursor="복사" aria-label={`메일 주소 복사: ${email}`}><FaEnvelope aria-hidden="true" />{email}<em>{done ? "복사됨" : "복사"}</em></button>
+    </p>
+  );
+}
 
 export default function Story() {
   const wrap = useRef(null), prog = useRef(0), stepRef = useRef(-1);
@@ -105,7 +119,7 @@ export default function Story() {
         },
       });
       stRef.current = tl.scrollTrigger;
-      // 마침표 길잡이: 히어로 문장 끝 마침표 → "끝까지 만든 프로젝트들입니다." → Talaria 제목 끝 → 지금 단계 이름 끝
+      // 마침표 길잡이: 히어로 문장 끝 마침표 → "불편을 찾는 것부터 해결까지, 그 과정을 담은 프로젝트입니다." → Talaria 제목 끝 → 지금 단계 이름 끝
       const target = () => {
         const el = sec.current, p = prog.current, s = stepRef.current;
         if (p < 0.05) return el.querySelector(".st-dot");
@@ -185,11 +199,12 @@ export default function Story() {
         <div className="st-cta">
           <button type="button" className="st-btn st-btn-w" onClick={() => window.dispatchEvent(new Event("goto-project"))}>프로젝트 보기 <FaArrowRight aria-hidden="true" /></button>
           <a className="st-btn st-btn-o" href={PROFILE.github} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
+          {PROFILE.email && <MailLine email={PROFILE.email} />}
         </div>
       </div>
       <div className="st-cue" aria-hidden="true"><i />SCROLL</div>
 
-      <p className="st-bridge"><small>PROJECTS</small>끝까지 만든 프로젝트들입니다<i className="gd-p" aria-hidden="true" /></p>
+      <p className="st-bridge"><small>PROJECTS</small>불편을 찾는 것부터 해결까지,<br />그 과정을 담은 프로젝트입니다<i className="gd-p" aria-hidden="true" /></p>
 
       <div className="st-chap">
         <p className="st-kicker">PROJECT 01 / {String(FEATURED).padStart(2, "0")}</p>

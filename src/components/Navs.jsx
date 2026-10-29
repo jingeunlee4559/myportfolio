@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "motion/react";
 import ThemeToggle from "./ThemeToggle";
+import { FaEnvelope, FaGithub } from "react-icons/fa6";
 import MobileMenu from "./MobileMenu";
 import { PROFILE } from "../data/profile";
 import { useDark } from "../lib/theme";
@@ -51,7 +52,10 @@ export default function Navs() {
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* 연락처: 어디서든 바로 메일·GitHub로 갈 수 있게 */}
+            {PROFILE.email && <a href={`mailto:${PROFILE.email}`} className="nav-ic" aria-label={`메일 보내기: ${PROFILE.email}`} data-cursor="메일"><FaEnvelope aria-hidden="true" /></a>}
+            <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="nav-ic" aria-label="GitHub 열기" data-cursor="GitHub"><FaGithub aria-hidden="true" /></a>
             <ThemeToggle />
             <button type="button" className={`mm-btn md:hidden ${menu ? "on" : ""}`} onClick={() => setMenu((v) => !v)} aria-expanded={menu} aria-controls="mobile-menu" aria-label={menu ? "메뉴 닫기" : "메뉴 열기"}>
               <i /><i />
