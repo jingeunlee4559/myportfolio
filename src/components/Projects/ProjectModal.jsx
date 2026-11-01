@@ -456,24 +456,34 @@ function Story({ st, award }) {
       <div className="pm-st-top1">
         <p className="pm-st-h">{st.headline}<span className="text-accent">.</span></p>
         <div>
-          <p className="pm-label !text-accent">개요</p>
-          <p className="mt-2.5 text-[1.02rem] font-medium leading-[1.85] text-ink/75">{st.summary}</p>
+          <p className="pm-label !text-accent">{st.conclusion ? "배경" : "개요"}</p>
+          <p className="mt-2.5 text-[1.04rem] font-medium leading-[1.9] text-ink/80"><Rich text={st.summary} /></p>
         </div>
       </div>
-      <ol className="pm-cd pm-card">
+      {st.bridge && <p className="pm-bf-bridge">{st.bridge}</p>}
+      <ol className={`pm-bf pm-bf-n${st.pairs.length}`}>
         {st.pairs.map((pr, k) => (
-          <li key={pr.problem} className="pm-cd-row">
-            <span className="pm-cd-no pm-solid">{k + 1}</span>
-            <div className="min-w-0">
-              <p className="pm-cd-p"><span className="sr-only">불편: </span>{pr.problem}</p>
-              <div className="pm-cd-s">
-                <FaArrowRight className="pm-cd-ar" aria-hidden="true" />
-                <div className="min-w-0"><p><span className="sr-only">해결: </span><Rich text={pr.solution} /></p><Tech list={pr.tech} /></div>
-              </div>
+          <li key={pr.problem} className="pm-bf-card">
+            <div className="pm-bf-top">
+              <span className="pm-bf-no">{String(k + 1).padStart(2, "0")}</span>
+              <p><span className="sr-only">불편: </span>{pr.problem}</p>
+            </div>
+            <div className="pm-bf-bot">
+              <span className="pm-bf-ar" aria-hidden="true"><FaArrowRight /></span>
+              <p><span className="sr-only">해결: </span><Rich text={pr.solution} /></p>
             </div>
           </li>
         ))}
       </ol>
+      {st.conclusion ? (
+        <div className="pm-cc">
+          <div className="pm-cc-head">
+            <p className="pm-cc-h"><FaCheck aria-hidden="true" />결론</p>
+            {award && <p className="pm-st-award"><FaTrophy aria-hidden="true" />{award}</p>}
+          </div>
+          <p className="pm-cc-t"><Rich text={st.outcome} /></p>
+        </div>
+      ) : (
       <div className="pm-st-out">
         <div>
           <p className="pm-label !text-accent">성과</p>
@@ -481,6 +491,7 @@ function Story({ st, award }) {
         </div>
         {award && <p className="pm-st-award"><FaTrophy aria-hidden="true" />{award}</p>}
       </div>
+      )}
     </div>
   );
 }
