@@ -1506,3 +1506,24 @@ html:not(.dark) .nav-open .nav-logo, html:not(.dark) .nav-open #logoText { color
   .pm-bf-n3 > .pm-bf-card { display: grid; grid-row: span 2; grid-template-rows: subgrid; gap: 0; }
   .pm-bf-n3 .pm-bf-top { min-height: 0 !important; }
 }
+
+/* =====================================================================
+   v7.1 — 휴대폰·태블릿(손가락 조작) 성능
+   배경 흐림(backdrop-filter)은 뒤 화면을 매 프레임 다시 흐리게 그려야 해서 휴대폰에서 가장 무겁습니다.
+   손가락 조작 기기에서는 흐림을 끄고, 대신 배경을 조금 더 진하게 해 글자가 잘 보이게 합니다.
+   ===================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .modal-bd { background-color: rgb(15 22 41 / .62) !important; }
+  .dark .modal-bd { background-color: rgb(2 6 16 / .82) !important; }
+  .pm-topbar { background: rgba(255,255,255,.96); }
+  .pm-nav { background: rgba(244,246,251,.97); }
+  .fc-card { background: rgba(255,255,255,.95); }
+  .dark .pm-topbar { background: rgba(10,17,36,.96); }
+  .dark .pm-nav { background: rgba(10,17,36,.97); }
+  .dark .fc-card { background: rgba(19,28,56,.96); }
+  .gd-trail { display: none; }
+  /* 상단 메뉴 바: 흐림 대신 거의 불투명한 배경 */
+  nav.backdrop-blur-2xl.bg-white\/80 { background-color: rgb(255 255 255 / .95); }
+  nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rgb(15 23 48 / .96); }
+}

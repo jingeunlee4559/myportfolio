@@ -6,16 +6,23 @@ import { gsap, ScrollTrigger, lenisRef } from "../lib/gsap";
 // 모션 줄이기 설정이면 켜지 않습니다.
 export default function SmoothScroll() {
   // 방명록이 늦게 불러와지거나 글이 늘어 페이지 길이가 바뀌면, 스크롤 연출 위치를 다시 계산합니다.
+  // 스크롤하는 도중에 다시 계산하면 고정 구간 길이가 바뀌면서 보던 위치가 튀므로, 스크롤이 멈춘 뒤에만 계산합니다.
   useEffect(() => {
-    let last = document.body.scrollHeight, t = 0;
+    let last = document.body.scrollHeight, t = 0, scrolledAt = 0;
+    const onScroll = () => { scrolledAt = performance.now(); };
+    const run = () => {
+      if (performance.now() - scrolledAt < 350) { t = setTimeout(run, 200); return; }
+      ScrollTrigger.refresh(); last = document.body.scrollHeight;
+    };
     const ro = new ResizeObserver(() => {
       const h = document.body.scrollHeight;
       if (Math.abs(h - last) < 2) return;
       clearTimeout(t);
-      t = setTimeout(() => { ScrollTrigger.refresh(); last = document.body.scrollHeight; }, 300);
+      t = setTimeout(run, 300);
     });
+    window.addEventListener("scroll", onScroll, { passive: true });
     ro.observe(document.querySelector("main") || document.body);
-    return () => { ro.disconnect(); clearTimeout(t); };
+    return () => { ro.disconnect(); clearTimeout(t); window.removeEventListener("scroll", onScroll); };
   }, []);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

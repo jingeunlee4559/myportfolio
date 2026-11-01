@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { layers } from "../data/skills";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT as reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
 
 // 기술 — 세 번째 장(CHAPTER 03): 밤하늘 별자리
 //  ① 밝은 화면 위로 남색 카드가 올라와 화면을 꽉 채우며 밤하늘이 됨 (인트로의 밤하늘과 이어짐)
@@ -69,7 +69,7 @@ export default function Skills() {
         const el = sec.current, n = gRef.current;
         return n < 0 ? el.querySelector(".sk2-title .gd-p") : el.querySelectorAll(".sk2-g .gd-p")[n];
       }, { start: "top 60%", end: "bottom 40%" });
-      const onResize = () => draw(gRef.current);
+      const onResize = onWidthResize(() => draw(gRef.current));
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }, sec);

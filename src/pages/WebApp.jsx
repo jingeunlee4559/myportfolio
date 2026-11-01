@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaBell } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
 import { guideZone } from "../lib/guide";
 import { WEBAPP as D, FEATURED } from "../data/story";
 
@@ -92,7 +92,7 @@ export default function WebApp() {
         if (p < 0.76) return el.querySelector(".wa-push .gd-badge");
         return el.querySelector(".wa-cap-r .gd-p");
       });
-      const onResize = () => { measure(); apply(); };
+      const onResize = onWidthResize(() => { measure(); apply(); });
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }, sec);

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "../lib/gsap";
 import { guide } from "../lib/guide";
-import { reduced } from "../lib/env";
+import { reduced, touch } from "../lib/env";
 
 // 마침표 길잡이를 그리는 층: 파란 점 하나 + 지나간 자리에 남는 짧은 빛 꼬리.
 // 각 장면이 정해 준 "마침표 자리"(요소)의 실제 위치를 매 프레임 읽어 부드럽게 따라갑니다.
@@ -16,7 +16,8 @@ export default function Guide() {
     document.documentElement.classList.add("gd-live");
     const c = cv.current, g = c.getContext("2d");
     let W = 0, H = 0, DPR = 1;
-    const size = () => { W = innerWidth; H = innerHeight; DPR = Math.min(2, devicePixelRatio || 1); c.width = W * DPR; c.height = H * DPR; };
+    // 휴대폰에서는 빛 꼬리를 그리지 않습니다. (화면 전체를 매 프레임 다시 그리는 작업이라 무거움)
+    const size = () => { W = innerWidth; H = innerHeight; if (touch) return; DPR = Math.min(2, devicePixelRatio || 1); c.width = W * DPR; c.height = H * DPR; };
     size(); addEventListener("resize", size);
     // 인트로가 끝나고 히어로 문장이 다 올라온 뒤(약 0.9초) 마침표가 떨어지듯 등장
     let readyAt = window.__introDone ? performance.now() + 900 : Infinity;
@@ -24,7 +25,8 @@ export default function Guide() {
     window.addEventListener("intro-done", onIntro);
     const P = { x: innerWidth / 2, y: -60, s: 16, o: 0, r: 47, g: 140, b: 255 };
     const trail = [];
-    let shown = false;
+    let shown = false, prevEl = null;
+    const off = { x: 0, y: 0 };
     const tick = (_, dt) => {
       const now = performance.now();
       const el = now > readyAt ? guide.resolve() : null;
@@ -41,10 +43,19 @@ export default function Guide() {
           if (!inside) { tx = Math.max(-30, Math.min(W + 30, tx)); ty = Math.max(-30, Math.min(H + 30, ty)); }
         }
       }
-      if (to && !shown) { shown = true; P.x = tx; P.y = ty - Math.min(220, H * 0.3); P.s = ts; }
       const f = Math.max(0.5, Math.min(3, dt / 16.7));
       const k = 1 - Math.pow(1 - 0.17, f);
-      P.x += (tx - P.x) * k; P.y += (ty - P.y) * k;
+      if (el && el.isConnected) {
+        // 자리가 바뀌면 "지금 점 위치 - 새 자리"만큼을 떨어진 거리로 두고, 그 거리만 서서히 줄입니다.
+        // 스크롤로 자리가 움직이는 건 매 프레임 그대로 따라가므로, 스크롤 중에도 점이 자리에서 밀려나지 않습니다.
+        if (to && !shown) { shown = true; P.s = ts; off.x = 0; off.y = -Math.min(220, H * 0.3); }
+        else if (el !== prevEl) { off.x = P.x - tx; off.y = P.y - ty; }
+        prevEl = el;
+        off.x -= off.x * k; off.y -= off.y * k;
+        if (Math.abs(off.x) < 0.05) off.x = 0;
+        if (Math.abs(off.y) < 0.05) off.y = 0;
+        P.x = tx + off.x; P.y = ty + off.y;
+      } else prevEl = null;
       P.s += (ts - P.s) * (1 - Math.pow(0.8, f)); P.o += (to - P.o) * (1 - Math.pow(0.84, f));
       P.r += (tone[0] - P.r) * 0.15; P.g += (tone[1] - P.g) * 0.15; P.b += (tone[2] - P.b) * 0.15;
       const col = `${P.r | 0},${P.g | 0},${P.b | 0}`;
@@ -53,7 +64,8 @@ export default function Guide() {
       d.style.width = d.style.height = `${P.s.toFixed(2)}px`;
       d.style.opacity = P.o.toFixed(3);
       d.style.setProperty("--gc", col);
-      // 빛 꼬리: 빠르게 움직일 때만 길게 남음
+      // 빛 꼬리: 빠르게 움직일 때만 길게 남음 (휴대폰은 생략)
+      if (touch) return;
       const last = trail[trail.length - 1];
       if (P.o > 0.2 && (!last || Math.hypot(last.x - P.x, last.y - P.y) > 1)) trail.push({ x: P.x, y: P.y, t: now, s: P.s });
       while (trail.length && now - trail[0].t > 380) trail.shift();

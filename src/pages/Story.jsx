@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaEnvelope, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
 import { guide, guideZone } from "../lib/guide";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
@@ -156,7 +156,7 @@ export default function Story() {
         .fromTo(".st-bgw", { xPercent: -10 }, { xPercent: -30, duration: 0.42, immediateRender: false }, 0.54);
       tl.to({}, { duration: 0.06 }, 0.94);
       // 화면 크기가 바뀌는 즉시 자리 다시 읽기 (스크롤 연출 전체 재계산은 ScrollTrigger가 이어서 함)
-      const onResize = () => { measure(); apply(); };
+      const onResize = onWidthResize(() => { measure(); apply(); });
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     }, sec);
