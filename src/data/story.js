@@ -16,8 +16,9 @@ export const CHAPTERS = {
   talaria: {
     idx: 7,
     name: "Talaria",
-    video: "/story/talaria.mp4",
-    poster: "/story/talaria_poster.jpg",
+    // 노트북에 처음 보이는 서비스 메인 화면. (예전에는 짧은 영상이었으나, 얼굴 노출·재생 부담·화면 겹침 문제로 이미지로 교체.
+    //  전체 시연 영상은 상세 창에 있습니다)
+    cover: { img: "/story/project_tal1.webp", title: "메인 화면" },
     title: ["자막·매너 체크·문서가", "한 화면에 모이는", "화상회의 UI"],
     steps: [
       { img: "/story/project_tal5.webp", title: "실시간 회의 화면", text: "상대가 말하면 번역된 말이 자막으로 뜹니다." },
@@ -28,8 +29,7 @@ export const CHAPTERS = {
   wedding: {
     idx: 4,
     name: "웨딩플랜",
-    video: "/story/wedding.mp4",
-    poster: "/story/wedding_poster.jpg",
+    cover: { img: "/story/project_wd.webp", title: "메인 화면" },
     title: ["유사도 분석으로", "맞춤 웨딩플랜을", "추천하는 서비스"],
     steps: [
       { img: "/story/project_wd7.webp", title: "단계별 입력 · 추천 결과", text: "조건을 세 단계로 나눠 고르고, 추천 결과를 봅니다." },
@@ -37,7 +37,7 @@ export const CHAPTERS = {
       { img: "/story/project_wd1.webp", title: "캘린더 · 날씨", text: "달력에 내 일정을 보여주고, 날씨도 함께 표시합니다." },
     ],
   },
-  // 영상이 없는 프로젝트는 첫 화면 사진부터 보여줍니다.
+  // 메인 화면(cover)이 없는 프로젝트는 첫 기능 화면부터 보여줍니다.
   signal: {
     idx: 1,
     name: "AI 신호등",

@@ -21,7 +21,8 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
   const wrap = useRef(null), sec = useRef(null), vid = useRef(null), stepRef = useRef(-1);
   const [step, setStep] = useState(reduced ? 0 : -1);
   const p = projects[data.idx];
-  const hasVid = !!data.video;
+  // 첫 화면(메인 화면 이미지 또는 영상)이 있으면 그것부터, 없으면 첫 기능 화면부터 보여줍니다.
+  const hasVid = !!(data.video || data.cover);
   // 단계가 바뀌는 진행도: 영상이 있으면 영상 → 1 → 2 → 3, 없으면 바로 1단계부터
   const AT = hasVid ? [0.3, 0.55, 0.78] : [0.1, 0.45, 0.74];
 
@@ -45,7 +46,7 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
           onUpdate: (st) => {
             const q = st.progress, s = q < AT[0] ? -1 : q < AT[1] ? 0 : q < AT[2] ? 1 : 2;
             if (s !== last) { last = s; stepRef.current = s; setStep(s); }
-            const v = vid.current; if (!v) return;
+            const v = vid.current; if (!v || v.tagName !== "VIDEO") return;
             if (q > 0.02 && q < AT[0] + 0.02) { if (v.paused) v.play().catch(() => {}); } else if (!v.paused) v.pause();
           },
         },
@@ -97,7 +98,9 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
             <div className="chp-screen">
               {layers.map((s, k) => s
                 ? <img key={k} className={`chp-scr ${k === 0 ? "chp-scr-0" : ""}`} src={s.img} alt={`${data.name} ${s.title}`} loading="lazy" />
-                : <video key={k} ref={vid} className="chp-scr chp-scr-0" src={data.video} poster={data.poster} muted loop playsInline preload="metadata" aria-label={`${data.name} 시연 영상`} />)}
+                : data.cover
+                  ? <img key={k} ref={vid} className="chp-scr chp-scr-0" src={data.cover.img} alt={`${data.name} ${data.cover.title}`} loading="lazy" />
+                  : <video key={k} ref={vid} className="chp-scr chp-scr-0" src={data.video} poster={data.poster} muted loop playsInline preload="metadata" aria-label={`${data.name} 시연 영상`} />)}
             </div>
           </div>
           <div className="chp-base" aria-hidden="true" />

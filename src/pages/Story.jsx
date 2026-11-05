@@ -118,8 +118,6 @@ export default function Story() {
             const p = st.progress, s = p < STEP_AT[0] ? -1 : p < STEP_AT[1] ? 0 : p < STEP_AT[2] ? 1 : 2;
             prog.current = p;
             if (s !== last) { last = s; stepRef.current = s; setStep(s); }
-            const v = vid.current; if (!v) return;
-            if (p > 0.2 && p < STEP_AT[0] + 0.02) { if (v.paused) v.play().catch(() => {}); } else if (!v.paused) v.pause();
           },
         },
       });
@@ -142,7 +140,9 @@ export default function Story() {
         .fromTo(".st-bridge", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.08, immediateRender: false }, 0.14)
         // 노트북이 생기고 화면이 프로젝트 영상으로 바뀜
         .fromTo([lap.current, base.current], { opacity: 0 }, { opacity: 1, duration: 0.06, immediateRender: false }, 0.2)
-        .fromTo(vid.current, { opacity: 0 }, { opacity: 1, duration: 0.06, immediateRender: false }, 0.25)
+        // Talaria 메인 화면은 "PROJECTS · 불편을 찾는 것부터…" 문구가 지나가고, 노트북이 옆으로 비켜나며
+        // Talaria 제목이 나올 때 바뀝니다. (그 전까지 노트북 화면 속에는 여러 프로젝트 화면 벽이 그대로 흐름)
+        .fromTo(vid.current, { opacity: 0 }, { opacity: 1, duration: 0.06, immediateRender: false }, 0.35)
         .fromTo(".st-bridge", { opacity: 1, y: 0 }, { opacity: 0, y: -30, duration: 0.06, immediateRender: false }, 0.3)
         // 노트북이 비켜나고 설명이 나옴
         .fromTo(K, { b: 0 }, { b: 1, duration: 0.12, onUpdate: apply, immediateRender: false }, 0.34)
@@ -194,7 +194,7 @@ export default function Story() {
         </div>
         <div className="st-shade" aria-hidden="true" />
         <div ref={screen} className="st-screen">
-          <video ref={vid} className="st-scr" src={T.video} poster={T.poster} muted loop playsInline preload="metadata" aria-label={`${T.name} 시연 영상`} />
+          <img ref={vid} className="st-scr" src={T.cover.img} alt={`${T.name} ${T.cover.title}`} loading="lazy" decoding="async" />
           {T.steps.map((s, k) => <img key={k} data-k={k} className="st-scr" src={s.img} alt={`${T.name} ${s.title}`} loading="lazy" />)}
         </div>
       </div>
