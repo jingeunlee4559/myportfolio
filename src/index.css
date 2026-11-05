@@ -1512,21 +1512,20 @@ html:not(.dark) .nav-open .nav-logo, html:not(.dark) .nav-open #logoText { color
    배경 흐림(backdrop-filter)은 뒤 화면을 매 프레임 다시 흐리게 그려야 해서 휴대폰에서 가장 무겁습니다.
    손가락 조작 기기에서는 흐림을 끄고, 대신 배경을 조금 더 진하게 해 글자가 잘 보이게 합니다.
    ===================================================================== */
-@media (hover: none) and (pointer: coarse) {
-  *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-  .modal-bd { background-color: rgb(15 22 41 / .62) !important; }
-  .dark .modal-bd { background-color: rgb(2 6 16 / .82) !important; }
-  .pm-topbar { background: rgba(255,255,255,.96); }
-  .pm-nav { background: rgba(244,246,251,.97); }
-  .fc-card { background: rgba(255,255,255,.95); }
-  .dark .pm-topbar { background: rgba(10,17,36,.96); }
-  .dark .pm-nav { background: rgba(10,17,36,.97); }
-  .dark .fc-card { background: rgba(19,28,56,.96); }
-  .gd-trail { display: none; }
-  /* 상단 메뉴 바: 흐림 대신 거의 불투명한 배경 */
-  nav.backdrop-blur-2xl.bg-white\/80 { background-color: rgb(255 255 255 / .95); }
-  nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rgb(15 23 48 / .96); }
-}
+/* v7.4: 미디어 조건(hover:none) 대신 html[data-lite]로 판단합니다. (일부 갤럭시·삼성 인터넷에서 조건이 안 맞아 빠지던 문제) */
+html[data-lite] *, html[data-lite] *::before, html[data-lite] *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-lite] .modal-bd { background-color: rgb(15 22 41 / .62) !important; }
+html[data-lite].dark .modal-bd { background-color: rgb(2 6 16 / .82) !important; }
+html[data-lite] .pm-topbar { background: #fff; }
+html[data-lite] .pm-nav { background: #f4f6fb; }
+html[data-lite] .fc-card { background: rgba(255,255,255,.95); }
+html[data-lite].dark .pm-topbar { background: #0a1124; }
+html[data-lite].dark .pm-nav { background: #0a1124; }
+html[data-lite].dark .fc-card { background: rgba(19,28,56,.96); }
+html[data-lite] .gd-trail { display: none; }
+/* 상단 메뉴 바: 흐림 대신 거의 불투명한 배경 */
+html[data-lite] nav.backdrop-blur-2xl.bg-white\/80 { background-color: rgb(255 255 255 / .95); }
+html[data-lite] nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rgb(15 23 48 / .96); }
 
 /* =====================================================================
    v7.2 — 가벼운 연출(lite): 휴대폰·태블릿·앱 안 브라우저(카톡 등)·저사양 기기
@@ -1575,8 +1574,8 @@ html[data-lite] .pm-head::after { display: none; }
 /* 아주 좁은 화면(340px 이하): 점 대신 앞의 "05 / 05"가 진행 상황을 알려 주므로 점은 숨깁니다. */
 @media (max-width: 340px) { .ab-dots { display: none; } }
 /* 휴대폰에서는 흐림(backdrop-filter)이 꺼져 있어, 고정 줄 뒤로 지나가는 글자가 비쳐 보입니다. 배경을 거의 불투명하게. */
-@media (hover: none) and (pointer: coarse) and (max-width: 900px) {
-  .ab-side { background: color-mix(in srgb, var(--st-bg) 97%, transparent); }
+@media (max-width: 900px) {
+  html[data-lite] .ab-side { background: color-mix(in srgb, var(--st-bg) 97%, transparent); }
 }
 
 /* ---------- v7.3 휴대폰·태블릿 추가 경량화 ----------
@@ -1585,3 +1584,74 @@ html[data-lite] .acc-bg, html[data-lite] .acc-p.on .acc-bg { filter: none; trans
 html[data-lite] .acc-tags i { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0,0,0,.28); }
 /* 소개 사진 둘레의 점선 원이 끝없이 도는 장식: 멈춤 */
 html[data-lite] .ab-halo::after { animation: none; }
+
+/* =====================================================================
+   v7.4 — 휴대폰·태블릿 전용 대표 프로젝트 (MobileFeatured)
+   PC 장면과 같은 글꼴·색·노트북 프레임·버튼을 쓰고, 움직임은 "처음 들어올 때 한 번 미끄러져 들어오기"만 남깁니다.
+   ===================================================================== */
+/* 히어로: 이미지 벽은 멈춘 배경 */
+.mh .st-col { will-change: auto; }
+.mh .st-wallin img { transform: none; }
+
+.mf { position: relative; padding: 8px 22px 24px; background: var(--st-bg); overflow-x: clip; }
+.mf-intro { margin: 64px 0 18px; text-align: center; font-size: clamp(1.2rem, 5.4vw, 1.6rem); font-weight: 800; line-height: 1.4; letter-spacing: -.045em; color: var(--color-ink); }
+.mf-intro > span { display: inline-block; }
+.mf-intro small { display: block; margin-bottom: 10px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .3em; color: var(--color-accent); }
+.mf-card { padding: 40px 0 44px; max-width: 640px; margin: 0 auto; }
+.mf-card + .mf-card { border-top: 1px solid var(--st-line); }
+
+/* 노트북 (PC 장면의 노트북 프레임 그대로) */
+.mf-dev { position: relative; margin: 0 6px 30px; }
+.mf-lap-btn { display: block; width: 100%; border: 0; font: inherit; cursor: pointer; }
+.mf-lap .chp-base { margin: 0 -6%; height: 10px; }
+.mf-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: 50% 50%; background: #eef1f6; }
+/* 웹·앱: 노트북 + 오른쪽 아래에 걸친 폰 */
+.mf-dev-wa { padding-right: 18%; }
+.mf-ph { position: absolute; right: 0; bottom: -14px; width: 27%; aspect-ratio: .48; padding: 5px; border: 0; border-radius: 18px; background: var(--st-dev); box-shadow: 0 24px 40px -20px rgba(11,15,26,.55), inset 0 0 0 1.5px #2a2f3d; cursor: pointer; }
+.mf-ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; border-radius: 13px; background: #fff; }
+
+/* 설명: 기능 3줄을 모두 진하게 보여 줌 (PC는 스크롤 단계마다 한 줄씩 진해짐) */
+.mf .st-kicker { display: block; margin-bottom: 8px; }
+.mf .st-h2 { font-size: clamp(1.5rem, 6.6vw, 2rem); margin-top: 10px; }
+.mf .st-steps { gap: 12px; margin-top: 18px; }
+.mf .st-steps li { color: var(--color-ink); border-color: var(--st-line); }
+.mf .st-steps li:first-child { border-color: var(--color-accent); }
+.mf .st-steps li b { font-size: 15.5px; }
+.mf .st-steps li span { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.6; color: var(--st-sub); }
+.mf .st-more { height: 46px; margin-top: 22px; }
+
+/* 처음 들어올 때 한 번: 노트북은 옆에서, 설명은 아래에서 (짧은 거리, transform·opacity만) */
+.mf-anim .mf-from-l, .mf-anim .mf-from-r, .mf-anim .mf-from-b { opacity: 0; transition: opacity .7s ease, transform .8s cubic-bezier(.16,1,.3,1); }
+.mf-anim .mf-from-l { transform: translate3d(-48px, 0, 0); }
+.mf-anim .mf-from-r { transform: translate3d(48px, 0, 0); }
+.mf-anim .mf-from-b { transform: translate3d(0, 28px, 0); }
+.mf-anim.in .mf-from-l, .mf-anim.in .mf-from-r, .mf-anim.in .mf-from-b { opacity: 1; transform: none; }
+.mf-anim.in .mf-text { transition-delay: .12s; }
+.mf-anim.in .mf-ph { transition-delay: .08s; }
+@media (prefers-reduced-motion: reduce) {
+  .mf-anim .mf-from-l, .mf-anim .mf-from-r, .mf-anim .mf-from-b { opacity: 1; transform: none; transition: none; }
+}
+/* 태블릿: 노트북 왼쪽, 설명 오른쪽 */
+@media (min-width: 820px) {
+  .mf-card { max-width: 1040px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 44px; align-items: center; padding: 64px 0; }
+  .mf-dev { margin: 0; }
+}
+
+/* ---------- 카톡: 브라우저로 열기 안내 ---------- */
+.oib { position: fixed; z-index: 65; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); translate: -50% 0; display: flex; align-items: center; gap: 4px; width: min(420px, calc(100% - 24px)); padding: 6px; border-radius: 18px; background: #0f1629; color: #fff; box-shadow: 0 18px 40px -16px rgba(11,15,26,.6); animation: oibIn .5s cubic-bezier(.16,1,.3,1); }
+@keyframes oibIn { from { opacity: 0; transform: translateY(16px); } }
+.oib-go { flex: 1; min-width: 0; margin: 0; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.oib-go > svg { flex-shrink: 0; font-size: 16px; color: #8fc8ff; }
+.oib-go span { display: grid; gap: 1px; min-width: 0; }
+.oib-go b { font-size: 14px; font-weight: 800; letter-spacing: -.03em; }
+.oib-go small { font-size: 12px; color: rgba(220,232,255,.7); }
+.oib-ios { cursor: default; }
+.oib-x { flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; font-size: 15px; cursor: pointer; }
+html.dark .oib { background: #fff; color: #0f1629; } html.dark .oib-go small { color: #4a5163; } html.dark .oib-x { background: #f2f4f6; color: #0f1629; } html.dark .oib-go > svg { color: var(--color-accent); }
+
+/* 휴대폰 상세 창: 배경 어둡게는 따로(pm-dim) 서서히, 창은 아래에서 올라옴 */
+html[data-lite] .modal-bd.pm-lite { background-color: transparent !important; }
+.pm-dim { position: absolute; inset: 0; background: rgb(15 22 41 / .62); }
+html.dark .pm-dim { background: rgb(2 6 16 / .82); }
+.mf-lap .chp-screen { display: block; }
+.mf-lap-btn { color: inherit; text-align: left; }

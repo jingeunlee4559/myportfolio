@@ -36,7 +36,7 @@ const E = gsap.parseEase("power2.inOut");
 const mix = (p, q, t) => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t, w: p.w + (q.w - p.w) * t, h: p.h + (q.h - p.h) * t });
 
 // 메일 주소 한 줄: 누르면 주소가 복사되고 "복사됨"이 잠깐 보입니다. 옆 아이콘은 메일 앱 열기.
-function MailLine({ email }) {
+export function MailLine({ email }) {
   const [done, setDone] = useState(false);
   const copy = async () => {
     try { await navigator.clipboard.writeText(email); setDone(true); setTimeout(() => setDone(false), 1600); }

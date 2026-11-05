@@ -2,10 +2,9 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { layers } from "../data/skills";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT, LITE_STATIC, onWidthResize, stableVH } from "../lib/env";
-
-// 휴대폰·태블릿에서는 별이 모이는 고정 연출 없이, 모든 기술 묶음을 켠 채 일반 스크롤로 보여줍니다.
-const reduced = STATIC_LAYOUT || LITE_STATIC;
+import { STATIC_LAYOUT as reduced, onWidthResize, stableVH } from "../lib/env";
+// 기술 스택은 휴대폰·태블릿에서도 PC와 같은 연출(별이 모이고, 묶음별로 아이콘이 켜지며 선으로 이어짐)을 씁니다.
+// 휴대폰에서 남는 유일한 고정(pin) 장면입니다.
 
 // 기술 — 세 번째 장(CHAPTER 03): 밤하늘 별자리
 //  ① 밝은 화면 위로 남색 카드가 올라와 화면을 꽉 채우며 밤하늘이 됨 (인트로의 밤하늘과 이어짐)
@@ -63,7 +62,7 @@ export default function Skills() {
       });
       // ② 흩어진 별 → 제자리 (자리는 매번 화면 크기에 맞춰 다시 계산)
       tl.fromTo(".sk2-t", {
-        x: (i) => (rnd(i, 5) - 0.5) * window.innerWidth * 0.9, y: (i) => (rnd(i, 6) - 0.5) * window.innerHeight * 0.9,
+        x: (i) => (rnd(i, 5) - 0.5) * window.innerWidth * 0.9, y: (i) => (rnd(i, 6) - 0.5) * stableVH() * 0.9,
         scale: (i) => 0.25 + rnd(i, 7) * 0.3, opacity: 0.35, rotate: (i) => (rnd(i, 8) - 0.5) * 60,
       }, { x: 0, y: 0, scale: 1, opacity: 1, rotate: 0, duration: A, ease: "power3.out", stagger: { each: 0.004, from: "random" }, immediateRender: true }, 0);
       tl.to({}, { duration: 0.05 }, 0.95);

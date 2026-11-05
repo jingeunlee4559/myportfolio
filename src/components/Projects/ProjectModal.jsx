@@ -13,6 +13,15 @@ const list = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChi
 const item = lite
   ? { hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } } }
   : { hidden: { opacity: 0, y: 28, filter: "blur(8px)" }, show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.9, ease: EASE } } };
+// 상세 창이 열리고 닫히는 모습.
+// 컴퓨터: 배경과 창이 함께 서서히 나타남. 휴대폰·태블릿: 창 전체가 반투명해지면 뒤 화면이 비쳐 보여서,
+// 창은 투명도 변화 없이 아래에서 올라오고/내려가고, 어두운 배경(pm-dim)만 따로 서서히 나타납니다.
+const BACK = lite
+  ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 1, transition: { duration: 0.32 } } }
+  : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.3 } };
+const SHEET = lite
+  ? { initial: { y: "100%" }, animate: { y: 0 }, exit: { y: "100%" }, transition: { type: "tween", duration: 0.32, ease: [0.32, 0.72, 0, 1] } }
+  : { initial: { y: 80, opacity: 0, scale: 0.96 }, animate: { y: 0, opacity: 1, scale: 1 }, exit: { y: 40, opacity: 0, scale: 0.98 }, transition: { type: "spring", stiffness: 240, damping: 28 } };
 // 대표색 위에서 글자가 읽히도록 밝기에 따라 검정/흰색을 고릅니다.
 const textOn = (hex) => { const n = parseInt(hex.slice(1), 16), l = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); return l > 165 ? "#0a0b10" : "#ffffff"; };
 
@@ -553,6 +562,15 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
     });
   };
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  // 휴대폰 목차 줄: 지금 보고 있는 섹션의 탭이 화면 밖에 있으면, 줄을 옆으로 밀어 가운데로 데려옵니다.
+  // (예: "05 기술 스택"까지 내려왔는데 탭 줄은 01~03에 머물러, 손으로 밀어야 보이던 문제)
+  const tabs2 = useRef(null);
+  useEffect(() => {
+    const nav = tabs2.current, cur = on && nav?.querySelector('[aria-current="true"]');
+    if (!nav || !cur || nav.scrollWidth <= nav.clientWidth) return;
+    const left = cur.offsetLeft - (nav.clientWidth - cur.offsetWidth) / 2;
+    nav.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [on]);
   const jump = (id) => {
     const t = scroller.current, el = t?.querySelector(`#pm-${id}`);
     if (t && el) t.scrollTo({ top: el.getBoundingClientRect().top - t.getBoundingClientRect().top + t.scrollTop - (window.matchMedia("(min-width:1024px)").matches ? 20 : 76), behavior: "smooth" });
@@ -561,9 +579,10 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   return (
     <AnimatePresence>
       {p && (
-        <motion.div key="modal" data-lenis-prevent className="fixed inset-0 z-[70] flex items-end justify-center bg-ink/40 modal-bd backdrop-blur-xl sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} onClick={onClose}>
+        <motion.div key="modal" data-lenis-prevent className={`fixed inset-0 z-[70] flex items-end justify-center bg-ink/40 modal-bd backdrop-blur-xl sm:items-center sm:p-6 ${lite ? "pm-lite" : ""}`} {...BACK} onClick={onClose}>
+          {lite && <motion.i className="pm-dim" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />}
           <motion.div role="dialog" aria-modal="true" aria-label={d.modalTitle} style={{ "--pm-c": c, "--pm-fg": textOn(c) }} onClick={(e) => e.stopPropagation()}
-            initial={{ y: 80, opacity: 0, scale: 0.96 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 40, opacity: 0, scale: 0.98 }} transition={{ type: "spring", stiffness: 240, damping: 28 }}
+            {...SHEET}
             className="pm-root pm-shell relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-t-[32px] border border-line shadow-[0_60px_140px_-30px_rgba(20,20,60,.5)] sm:h-[min(92vh,980px)] sm:rounded-[36px]">
             {/* 상단 바 */}
             <div className="pm-topbar relative flex shrink-0 items-center justify-between gap-3 border-b border-line px-5 py-3.5 md:px-8">
@@ -604,7 +623,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
                   </div>
 
                   {/* 섹션 바로가기 */}
-                  <nav aria-label="상세 목차" className="pm-nav sticky top-0 z-20 mt-12 flex gap-2 overflow-x-auto px-6 py-3 [scrollbar-width:none] md:px-12 lg:hidden">
+                  <nav ref={tabs2} aria-label="상세 목차" className="pm-nav sticky top-0 z-20 mt-12 flex gap-2 overflow-x-auto px-6 py-3 [scrollbar-width:none] md:px-12 lg:hidden">
                     {secs.map(([id, label]) => (
                       <button key={id} type="button" onClick={() => jump(id)} aria-current={on === id} className={`pm-pill shrink-0 rounded-full px-4 py-2 text-[13.5px] font-bold transition ${on === id ? "pm-pill-on" : ""}`}><span className="mr-1.5 font-mono text-[10.5px] opacity-60">{no(id)}</span>{label}</button>
                     ))}

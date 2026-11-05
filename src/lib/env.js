@@ -11,13 +11,18 @@ export const EASE = [0.16, 1, 0.3, 1];
 export const STATIC_LAYOUT = false;
 
 // 손가락으로 조작하는 기기(휴대폰·태블릿)인지. 이런 기기에서는 무거운 효과를 줄입니다.
-export const touch = typeof window !== "undefined" && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+// "(hover: none) and (pointer: coarse)"만으로 판단하면, S펜·에어뷰를 지원하는 일부 갤럭시처럼
+// 스스로를 "마우스로 가리킬 수 있는 기기"라고 알리는 폰이 PC로 잘못 판단됩니다. (삼성 인터넷에서 PC 연출이 그대로 나오던 원인)
+// 그래서 휴대폰·태블릿 운영체제(안드로이드, iOS, iPadOS)인지도 함께 봅니다.
+const nav = typeof navigator !== "undefined" ? navigator : {};
+const ua = nav.userAgent || "";
+const mobileOS = /Android|iPhone|iPad|iPod|Mobile|SamsungBrowser/i.test(ua) || (/Macintosh/.test(ua) && (nav.maxTouchPoints || 0) > 1); // 마지막은 아이패드(데스크톱 모드)
+export const touch = typeof window !== "undefined" && (mobileOS || window.matchMedia("(hover: none) and (pointer: coarse)").matches);
 
 // 가벼운 연출(lite)을 쓸 기기: 손가락 조작 기기, 카톡·인스타 같은 앱 안 브라우저, 코어·메모리가 적은 기기.
 // 이런 기기에서는 화면 전체를 다시 그리게 만드는 효과(블렌드 레이어, filter 애니메이션, 끝없이 흐르는 벽)를 끕니다.
 // 스크롤 고정 연출 같은 핵심 장면은 그대로 둡니다. html에 data-lite가 붙으므로 CSS에서도 같은 조건을 씁니다.
-const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-const inApp = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
+export const inApp = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
 const lowEnd = typeof navigator !== "undefined" && ((navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2);
 export const lite = touch || inApp || lowEnd;
 if (typeof document !== "undefined" && lite) document.documentElement.dataset.lite = "";
@@ -50,7 +55,9 @@ export function stableVH() {
   return probe.offsetHeight || window.innerHeight;
 }
 
-// 휴대폰·태블릿(lite)에서는 고정(pin) 스크롤 장면을 히어로·웹앱 두 개만 남기고,
-// 나머지 장면(웨딩·신호등 챕터, 그 밖의 프로젝트, 기술)은 고정 없이 일반 스크롤로 보여줍니다.
-// 고정 장면이 이어질수록 휴대폰에서 끊김·장면 튐·탭 빗나감이 생기기 쉬워서입니다.
+// 휴대폰·태블릿(lite)에서는 대표 프로젝트 영역을 휴대폰 전용 화면(MobileFeatured)으로 바꾸고,
+// 그 밖의 프로젝트는 고정 없이 보여줍니다. 기술 스택만 PC와 같은 고정 연출을 씁니다.
 export const LITE_STATIC = lite;
+// 카카오톡 안 브라우저인지 ("브라우저로 열기" 안내에 사용)
+export const isKakao = /KAKAOTALK/i.test(ua);
+export const isAndroid = /Android/i.test(ua);

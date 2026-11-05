@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "../lib/gsap";
-import { reduced } from "../lib/env";
+import { reduced, touch } from "../lib/env";
 
 // 마우스 포인터: 작은 파란 점 + 살짝 늦게 따라오는 고리.
 //  · 버튼·링크 위: 고리가 커지고 그 버튼 쪽으로 살짝 끌려감
@@ -17,7 +17,8 @@ export default function Cursor() {
   const dot = useRef(null), ring = useRef(null), txt = useRef(null);
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
-    if (!fine.matches) return;
+    // 휴대폰·태블릿은 "마우스 가능"이라고 알려도(일부 갤럭시) 쓰지 않습니다.
+    if (!fine.matches || touch) return;
     const html = document.documentElement;
     html.classList.add("cur-on");
     const d = dot.current, r = ring.current;

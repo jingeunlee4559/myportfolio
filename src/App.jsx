@@ -15,6 +15,9 @@ import ModalHost from "./components/ModalHost";
 import Guide from "./components/Guide";
 import Cursor from "./components/Cursor";
 import { CHAPTERS } from "./data/story";
+import MobileFeatured from "./pages/MobileFeatured";
+import OpenInBrowser from "./components/OpenInBrowser";
+import { lite } from "./lib/env";
 
 // 방명록은 Firebase를 쓰므로 필요할 때 따로 불러옵니다. (첫 화면 JS 크기 줄이기)
 const CommentBoard = lazy(() => import("./components/CommentBoard"));
@@ -28,10 +31,17 @@ export default function App() {
       <Intro />
       <Navs />
       <main className="page-bg relative z-10 rounded-b-[48px]">
-        <div data-nav="project"><Story /></div>
-        <div data-nav="project"><WebApp /></div>
-        <div data-nav="project"><Chapter data={CHAPTERS.wedding} flip id="wedding" no={3} /></div>
-        <div data-nav="project"><Chapter data={CHAPTERS.signal} id="signal" no={4} /></div>
+        {/* 휴대폰·태블릿: 대표 프로젝트를 고정 스크롤 장면 대신 전용 화면으로 (PC는 기존 장면 그대로) */}
+        {lite ? (
+          <div data-nav="project"><MobileFeatured /></div>
+        ) : (
+          <>
+            <div data-nav="project"><Story /></div>
+            <div data-nav="project"><WebApp /></div>
+            <div data-nav="project"><Chapter data={CHAPTERS.wedding} flip id="wedding" no={3} /></div>
+            <div data-nav="project"><Chapter data={CHAPTERS.signal} id="signal" no={4} /></div>
+          </>
+        )}
         <div data-nav="project"><MoreProjects /></div>
         <div data-nav="about"><About /></div>
         <div data-nav="skill"><Skills /></div>
@@ -43,6 +53,7 @@ export default function App() {
       <ModalHost />
       <Guide />
       <Cursor />
+      <OpenInBrowser />
       <Analytics />
     </MotionConfig>
   );
