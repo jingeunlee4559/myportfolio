@@ -16,7 +16,6 @@ import Guide from "./components/Guide";
 import Cursor from "./components/Cursor";
 import { CHAPTERS } from "./data/story";
 import MobileFeatured from "./pages/MobileFeatured";
-import ModeBar from "./components/ModeBar";
 import { SIMPLE } from "./lib/env";
 
 // 방명록은 Firebase를 쓰므로 필요할 때 따로 불러옵니다. (첫 화면 JS 크기 줄이기)
@@ -53,7 +52,6 @@ export default function App() {
       <ModalHost />
       <Guide />
       <Cursor />
-      <ModeBar />
       <Analytics />
     </MotionConfig>
   );

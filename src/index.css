@@ -1636,17 +1636,7 @@ html[data-mode="simple"] .ab-halo::after { animation: none; }
   .mf-dev { margin: 0; }
 }
 
-/* ---------- 카톡: 브라우저로 열기 안내 ---------- */
-.oib { position: fixed; z-index: 65; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); translate: -50% 0; display: flex; align-items: center; gap: 4px; width: min(420px, calc(100% - 24px)); padding: 6px; border-radius: 18px; background: #0f1629; color: #fff; box-shadow: 0 18px 40px -16px rgba(11,15,26,.6); animation: oibIn .5s cubic-bezier(.16,1,.3,1); }
-@keyframes oibIn { from { opacity: 0; transform: translateY(16px); } }
-.oib-go { flex: 1; min-width: 0; margin: 0; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.oib-go > svg { flex-shrink: 0; font-size: 16px; color: #8fc8ff; }
-.oib-go span { display: grid; gap: 1px; min-width: 0; }
-.oib-go b { font-size: 14px; font-weight: 800; letter-spacing: -.03em; }
-.oib-go small { font-size: 12px; color: rgba(220,232,255,.7); }
-.oib-ios { cursor: default; }
-.oib-x { flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: rgba(255,255,255,.08); color: #fff; font-size: 15px; cursor: pointer; }
-html.dark .oib { background: #fff; color: #0f1629; } html.dark .oib-go small { color: #4a5163; } html.dark .oib-x { background: #f2f4f6; color: #0f1629; } html.dark .oib-go > svg { color: var(--color-accent); }
+
 
 /* 휴대폰 상세 창: 배경 어둡게는 따로(pm-dim) 서서히, 창은 아래에서 올라옴 */
 html[data-lite] .modal-bd.pm-lite { background-color: transparent !important; }
@@ -1666,27 +1656,6 @@ html[data-lite] .mh-flow .st-col:nth-child(even) { animation-name: mhDown; }
 html[data-lite] .mh-pause .st-col { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { html[data-lite] .mh-flow .st-col { animation: none; } }
 
-/* =====================================================================
-   v10 — 화면 버전 안내 바 · 메뉴 스위치 · 휴대폰 라벨 점 정리
-   ===================================================================== */
-.oib-go > span { gap: 2px; }
-.oib-copy { justify-self: start; margin-top: 6px; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: #fff; color: #0f1629; font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; }
-html.dark .oib-copy { background: #0f1629; color: #fff; }
-.oib-go > svg { align-self: flex-start; margin-top: 3px; }
-
-/* 메뉴 맨 아래: 화면 버전 카드 — 제목 + 한 줄 설명, 아래에 반반 버튼(선택된 쪽으로 파란 알약이 미끄러짐) */
-.mm-mode { margin-top: 18px; padding: 14px; border-radius: 22px; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
-html:not(.dark) .mm-mode { background: rgba(255,255,255,.72); box-shadow: inset 0 0 0 1px rgba(15,22,41,.06), 0 14px 30px -20px rgba(47,110,255,.45); }
-.mm-mode-k { margin: 0 2px 12px; display: grid; gap: 2px; font-size: 13.5px; font-weight: 800; letter-spacing: -.02em; }
-.mm-mode-k small { font-size: 12px; font-weight: 600; opacity: .6; letter-spacing: -.01em; }
-.mm-mode-sw { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 16px; background: rgba(255,255,255,.08); }
-html:not(.dark) .mm-mode-sw { background: #eef2f9; }
-.mm-mode-pill { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px; background: linear-gradient(135deg, #2f8cff, #4f6bff); box-shadow: 0 8px 18px -8px rgba(47,110,255,.8); transition: transform .45s cubic-bezier(.16,1,.3,1); }
-.mm-mode-sw.is-full .mm-mode-pill { transform: translateX(100%); }
-.mm-mode-sw button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 44px; padding: 0 8px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; font-size: 13.5px; font-weight: 800; letter-spacing: -.02em; opacity: .55; cursor: pointer; transition: opacity .3s, color .3s; white-space: nowrap; }
-.mm-mode-sw button svg { font-size: 13px; }
-.mm-mode-sw button.on { opacity: 1; color: #fff; }
-
 /* 휴대폰·태블릿: 따라다니는 점이 없으므로, 짧은 라벨(기술 묶음 이름·단계 이름·프로젝트 이름·사진 이름) 끝의 점은 숨기고
    문장으로 끝나는 제목 끝의 파란 마침표만 남깁니다. */
 html[data-mode="simple"] .sk2-g h3 .gd-p,
@@ -1694,37 +1663,19 @@ html[data-mode="simple"] .st-steps .gd-p,
 html[data-mode="simple"] .acc-p h3 .gd-p,
 html[data-mode="simple"] .ab-photo figcaption .gd-p,
 html[data-mode="simple"] .wa-cap .gd-p { display: none; }
-html.mm-open .oib { display: none; }
-
-/* ---------- v11: 휴대폰 메뉴 크기 고정 ----------
-   카톡 등은 손가락이 닿을 때마다 위아래 막대가 접혔다 펴지며 화면 높이가 바뀝니다.
-   메뉴 간격이 화면 높이(vh)나 높이 조건에 따라 달라지면 메뉴가 커졌다 작아졌다 하므로, 높이와 상관없는 고정 크기를 씁니다.
-   (키가 아주 작은 폰에서 아래가 넘치면 메뉴 안에서 스크롤됨) */
 
 
 /* =====================================================================
-   v12 — 휴대폰 메뉴: 각 폰 화면에 딱 맞게 (스크롤 없이)
-   --u = 그 폰에서 위아래 막대가 다 펴졌을 때 화면 높이(100svh)의 1% (메뉴를 열 때 한 번 잼, MobileMenu.jsx)
-   글자·간격을 --u에 비례시켜 큰 폰은 넉넉하게, 작은 폰·카톡은 촘촘하게 맞춥니다. 막대가 움직여도 값은 그대로.
+   v13 — 휴대폰 메뉴: 정해진 크기, 위에서부터 차례로 (토스·카카오 메뉴 방식)
+   화면 높이에 따라 크기를 바꾸지 않아 어느 폰에서나 같은 모양이고, 위아래 막대가 움직여도 흔들리지 않습니다.
+   메일·GitHub 버튼을 빼서 아이폰 SE 같은 작은 폰에도 설명 줄까지 다 들어가고,
+   그보다 짧은 화면에서만 메뉴 안에서 스크롤됩니다. 스크롤은 위쪽 바 아래에서만 일어나 겹치지 않습니다.
    ===================================================================== */
-.mm { --u: 8.4px; }
-.mm-in { --top: clamp(78px, calc(var(--u) * 11.4), 100px);
-  margin-top: calc(var(--top) + env(safe-area-inset-top)); height: calc(100svh - var(--top) - env(safe-area-inset-top));
-  padding-top: 0; padding-bottom: calc(clamp(12px, calc(var(--u) * 3.2), 28px) + env(safe-area-inset-bottom)); }
-@supports not (height: 100svh) { .mm-in { height: calc(100vh - var(--top)); } }
-.mm-kick { margin-bottom: clamp(2px, calc(var(--u) * 1.2), 14px); }
-.mm-item { padding: clamp(5px, calc(var(--u) * 1.9), 22px) 0; }
-.mm-txt { gap: clamp(2px, calc(var(--u) * .5), 4px); }
-.mm-txt b { font-size: clamp(24px, min(10vw, calc(var(--u) * 5.3)), 52px); }
-.mm-txt small { font-size: clamp(11.5px, calc(var(--u) * 1.6), 13.5px); }
-.mm-no { padding-top: .45em; }
-.mm-foot { padding-top: clamp(8px, calc(var(--u) * 2.4), 28px); }
-.mm-foot a { height: clamp(34px, calc(var(--u) * 5.2), 44px); }
-.mm-mode { margin-top: clamp(8px, calc(var(--u) * 1.6), 18px); padding: clamp(8px, calc(var(--u) * 1.5), 14px); }
-.mm-mode-k { margin-bottom: clamp(6px, calc(var(--u) * 1.4), 12px); }
-.mm-mode-sw button { height: clamp(34px, calc(var(--u) * 5.2), 44px); }
-/* 작은 화면(막대가 다 펴졌을 때 680px 미만): 설명 줄을 줄여 한 화면에 들어오게 */
-.mm-tight .mm-txt small, .mm-tight .mm-mode-k small { display: none; }
-.mm-tight .mm-foot a { padding: 0 13px; font-size: 12.5px; }
-/* 다 들어가면 끌어도 움직이지 않게 */
-.mm.mm-fit, .mm.mm-fit .mm-in { touch-action: none; overflow: hidden; }
+.mm-in { --top: calc(96px + env(safe-area-inset-top));
+  margin-top: var(--top); height: calc(100vh - var(--top)); height: calc(100svh - var(--top));
+  padding: 0 24px calc(28px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+.mm-kick { margin: 0 0 12px; }
+.mm-item { padding: 18px 0; }
+.mm-txt { gap: 5px; }
+.mm-txt b { font-size: clamp(32px, 10vw, 48px); }
+.mm-txt small { display: block; font-size: 13.5px; line-height: 1.4; }
