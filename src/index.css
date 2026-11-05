@@ -1700,4 +1700,31 @@ html.mm-open .oib { display: none; }
    카톡 등은 손가락이 닿을 때마다 위아래 막대가 접혔다 펴지며 화면 높이가 바뀝니다.
    메뉴 간격이 화면 높이(vh)나 높이 조건에 따라 달라지면 메뉴가 커졌다 작아졌다 하므로, 높이와 상관없는 고정 크기를 씁니다.
    (키가 아주 작은 폰에서 아래가 넘치면 메뉴 안에서 스크롤됨) */
-.mm-item { padding: 20px 0; }
+
+
+/* =====================================================================
+   v12 — 휴대폰 메뉴: 각 폰 화면에 딱 맞게 (스크롤 없이)
+   --u = 그 폰에서 위아래 막대가 다 펴졌을 때 화면 높이(100svh)의 1% (메뉴를 열 때 한 번 잼, MobileMenu.jsx)
+   글자·간격을 --u에 비례시켜 큰 폰은 넉넉하게, 작은 폰·카톡은 촘촘하게 맞춥니다. 막대가 움직여도 값은 그대로.
+   ===================================================================== */
+.mm { --u: 8.4px; }
+.mm-in { --top: clamp(78px, calc(var(--u) * 11.4), 100px);
+  margin-top: calc(var(--top) + env(safe-area-inset-top)); height: calc(100svh - var(--top) - env(safe-area-inset-top));
+  padding-top: 0; padding-bottom: calc(clamp(12px, calc(var(--u) * 3.2), 28px) + env(safe-area-inset-bottom)); }
+@supports not (height: 100svh) { .mm-in { height: calc(100vh - var(--top)); } }
+.mm-kick { margin-bottom: clamp(2px, calc(var(--u) * 1.2), 14px); }
+.mm-item { padding: clamp(5px, calc(var(--u) * 1.9), 22px) 0; }
+.mm-txt { gap: clamp(2px, calc(var(--u) * .5), 4px); }
+.mm-txt b { font-size: clamp(24px, min(10vw, calc(var(--u) * 5.3)), 52px); }
+.mm-txt small { font-size: clamp(11.5px, calc(var(--u) * 1.6), 13.5px); }
+.mm-no { padding-top: .45em; }
+.mm-foot { padding-top: clamp(8px, calc(var(--u) * 2.4), 28px); }
+.mm-foot a { height: clamp(34px, calc(var(--u) * 5.2), 44px); }
+.mm-mode { margin-top: clamp(8px, calc(var(--u) * 1.6), 18px); padding: clamp(8px, calc(var(--u) * 1.5), 14px); }
+.mm-mode-k { margin-bottom: clamp(6px, calc(var(--u) * 1.4), 12px); }
+.mm-mode-sw button { height: clamp(34px, calc(var(--u) * 5.2), 44px); }
+/* 작은 화면(막대가 다 펴졌을 때 680px 미만): 설명 줄을 줄여 한 화면에 들어오게 */
+.mm-tight .mm-txt small, .mm-tight .mm-mode-k small { display: none; }
+.mm-tight .mm-foot a { padding: 0 13px; font-size: 12.5px; }
+/* 다 들어가면 끌어도 움직이지 않게 */
+.mm.mm-fit, .mm.mm-fit .mm-in { touch-action: none; overflow: hidden; }

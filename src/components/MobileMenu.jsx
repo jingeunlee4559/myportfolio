@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FaGithub, FaEnvelope, FaArrowRight, FaBolt, FaWandMagicSparkles } from "react-icons/fa6";
 import { PROFILE } from "../data/profile";
@@ -19,6 +19,27 @@ const DESC = { project: "대표 프로젝트 4개 · 그 밖의 프로젝트", a
 // 휴대폰·태블릿 메뉴: 화면을 덮는 판이 위에서 둥글게 내려오고, 큰 글자 메뉴가 차례로 올라옵니다.
 // 지금 보고 있는 섹션 옆에는 파란 마침표가 찍혀 있습니다.
 export default function MobileMenu({ open, onClose, links, active }) {
+  // ── 메뉴 크기: 각 폰 화면에 딱 맞게 (스크롤 없이) ──
+  // 메뉴를 열 때 "위아래 막대가 다 펴졌을 때의 화면 높이(100svh)"를 한 번 재서, 그 1%를 --u로 넘깁니다.
+  // 글자·간격은 --u에 비례해 폰마다 다르게 정해지고, svh는 막대가 접혔다 펴져도 바뀌지 않아
+  // 메뉴를 연 채로 카톡 막대가 움직여도 메뉴 크기가 흔들리지 않습니다.
+  const panel = useRef(null);
+  const [fit, setFit] = useState(null);
+  useLayoutEffect(() => {
+    if (!open) return;
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
+    document.body.appendChild(probe);
+    const H = probe.offsetHeight || window.innerHeight; probe.remove();
+    setFit({ u: H / 100, tight: H < 680 });
+  }, [open]);
+  // 다 들어가면 메뉴를 끌어도 움직이지 않게 (카톡 막대가 덜 흔들림)
+  useEffect(() => {
+    const el = panel.current?.querySelector(".mm-in");
+    if (!el || !fit) return;
+    panel.current.classList.toggle("mm-fit", el.scrollHeight <= el.clientHeight + 1);
+  }, [fit]);
+
   // 누른 메뉴 항목. 메뉴가 "완전히 닫힌 뒤"에 이동하려고 잠시 기억해 둡니다.
   const pending = useRef(null);
 
@@ -55,7 +76,7 @@ export default function MobileMenu({ open, onClose, links, active }) {
   return (
     <AnimatePresence onExitComplete={afterClose}>
       {open && (
-        <motion.div key="mm" id="mobile-menu" className="mm" role="dialog" aria-modal="true" aria-label="메뉴" data-lenis-prevent {...PANEL}>
+        <motion.div key="mm" id="mobile-menu" ref={panel} className={`mm ${fit?.tight ? "mm-tight" : ""}`} style={fit ? { "--u": `${fit.u}px` } : undefined} role="dialog" aria-modal="true" aria-label="메뉴" data-lenis-prevent {...PANEL}>
           <span className="mm-glow" aria-hidden="true" />
           <nav className="mm-in" aria-label="섹션 이동">
             <motion.p className="mm-kick" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.6, ease: EASE }}>MENU</motion.p>
