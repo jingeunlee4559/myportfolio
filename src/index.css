@@ -1522,7 +1522,7 @@ html[data-lite] .fc-card { background: rgba(255,255,255,.95); }
 html[data-lite].dark .pm-topbar { background: #0a1124; }
 html[data-lite].dark .pm-nav { background: #0a1124; }
 html[data-lite].dark .fc-card { background: rgba(19,28,56,.96); }
-html[data-lite] .gd-trail { display: none; }
+html[data-mode="simple"] .gd-trail { display: none; }
 /* 상단 메뉴 바: 흐림 대신 거의 불투명한 배경 */
 html[data-lite] nav.backdrop-blur-2xl.bg-white\/80 { background-color: rgb(255 255 255 / .95); }
 html[data-lite] nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rgb(15 23 48 / .96); }
@@ -1535,11 +1535,11 @@ html[data-lite] nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rg
 /* 화면 전체 종이 질감: 고정 레이어 + 블렌드라 스크롤할 때마다 화면 전체를 다시 섞어야 함 (투명도 3.5%라 꺼도 거의 티 안 남) */
 html[data-lite] body::after { display: none; }
 /* 큰 흐림 빛: blur(30px)를 큰 면적에 쓰면 무거움 → 흐림 없이 radial-gradient만 */
-html[data-lite] .st-glow, html[data-lite] .chp-glow { filter: none; }
+html[data-mode="simple"] .st-glow, html[data-mode="simple"] .chp-glow { filter: none; }
 /* 인트로 오로라 빛: 흐림 반경을 줄여 첫 화면 부담을 덜기 */
-html[data-lite] .in-aur { filter: blur(40px); }
+html[data-mode="simple"] .in-aur { filter: blur(40px); }
 /* 멈춘 벽은 GPU 레이어를 따로 잡아 둘 필요가 없음 (메모리 절약) */
-html[data-lite] .st-col { will-change: auto; }
+html[data-mode="simple"] .st-col { will-change: auto; }
 /* 모달 바깥(어두운 배경)을 당겨도 뒤 페이지로 스크롤이 번지지 않게. 안쪽 요소 전체(*)에 걸면 가로 스크롤 줄 위에서 시작한 세로 스크롤이 막히므로 바깥 판에만 겁니다. */
 html[data-lite] .modal-bd { overscroll-behavior: contain; }
 
@@ -1580,10 +1580,10 @@ html[data-lite] .pm-head::after { display: none; }
 
 /* ---------- v7.3 휴대폰·태블릿 추가 경량화 ----------
    그 밖의 프로젝트 카드: 큰 사진에 흑백·밝기 filter + 펼칠 때 filter 전환은 사진 전체를 다시 그려 무거움 → 끔 */
-html[data-lite] .acc-bg, html[data-lite] .acc-p.on .acc-bg { filter: none; transition: transform .8s cubic-bezier(.16,1,.3,1); }
+html[data-mode="simple"] .acc-bg, html[data-mode="simple"] .acc-p.on .acc-bg { filter: none; transition: transform .8s cubic-bezier(.16,1,.3,1); }
 html[data-lite] .acc-tags i { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0,0,0,.28); }
 /* 소개 사진 둘레의 점선 원이 끝없이 도는 장식: 멈춤 */
-html[data-lite] .ab-halo::after { animation: none; }
+html[data-mode="simple"] .ab-halo::after { animation: none; }
 
 /* =====================================================================
    v7.4 — 휴대폰·태블릿 전용 대표 프로젝트 (MobileFeatured)
@@ -1674,37 +1674,30 @@ html[data-lite] .mh-pause .st-col { animation-play-state: paused; }
 html.dark .oib-copy { background: #0f1629; color: #fff; }
 .oib-go > svg { align-self: flex-start; margin-top: 3px; }
 
-/* 메뉴 맨 아래: 화면 버전 [간편 모드 | 전체 애니메이션] */
-.mm-mode { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.1); }
-html:not(.dark) .mm-mode { border-top-color: rgba(15,22,41,.1); }
-.mm-mode-k { font-size: 12.5px; font-weight: 700; opacity: .65; }
-.mm-mode-sw { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
-html:not(.dark) .mm-mode-sw { background: rgba(15,22,41,.05); box-shadow: inset 0 0 0 1px rgba(15,22,41,.1); }
-.mm-mode-sw button { height: 34px; padding: 0 13px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 12.5px; font-weight: 800; opacity: .6; cursor: pointer; }
-.mm-mode-sw button.on { opacity: 1; background: var(--color-accent); color: #fff; }
+/* 메뉴 맨 아래: 화면 버전 카드 — 제목 + 한 줄 설명, 아래에 반반 버튼(선택된 쪽으로 파란 알약이 미끄러짐) */
+.mm-mode { margin-top: 18px; padding: 14px; border-radius: 22px; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+html:not(.dark) .mm-mode { background: rgba(255,255,255,.72); box-shadow: inset 0 0 0 1px rgba(15,22,41,.06), 0 14px 30px -20px rgba(47,110,255,.45); }
+.mm-mode-k { margin: 0 2px 12px; display: grid; gap: 2px; font-size: 13.5px; font-weight: 800; letter-spacing: -.02em; }
+.mm-mode-k small { font-size: 12px; font-weight: 600; opacity: .6; letter-spacing: -.01em; }
+.mm-mode-sw { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 16px; background: rgba(255,255,255,.08); }
+html:not(.dark) .mm-mode-sw { background: #eef2f9; }
+.mm-mode-pill { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 12px; background: linear-gradient(135deg, #2f8cff, #4f6bff); box-shadow: 0 8px 18px -8px rgba(47,110,255,.8); transition: transform .45s cubic-bezier(.16,1,.3,1); }
+.mm-mode-sw.is-full .mm-mode-pill { transform: translateX(100%); }
+.mm-mode-sw button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 44px; padding: 0 8px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; font-size: 13.5px; font-weight: 800; letter-spacing: -.02em; opacity: .55; cursor: pointer; transition: opacity .3s, color .3s; white-space: nowrap; }
+.mm-mode-sw button svg { font-size: 13px; }
+.mm-mode-sw button.on { opacity: 1; color: #fff; }
 
 /* 휴대폰·태블릿: 따라다니는 점이 없으므로, 짧은 라벨(기술 묶음 이름·단계 이름·프로젝트 이름·사진 이름) 끝의 점은 숨기고
    문장으로 끝나는 제목 끝의 파란 마침표만 남깁니다. */
-html[data-lite] .sk2-g h3 .gd-p,
-html[data-lite] .st-steps .gd-p,
-html[data-lite] .acc-p h3 .gd-p,
-html[data-lite] .ab-photo figcaption .gd-p,
-html[data-lite] .wa-cap .gd-p { display: none; }
+html[data-mode="simple"] .sk2-g h3 .gd-p,
+html[data-mode="simple"] .st-steps .gd-p,
+html[data-mode="simple"] .acc-p h3 .gd-p,
+html[data-mode="simple"] .ab-photo figcaption .gd-p,
+html[data-mode="simple"] .wa-cap .gd-p { display: none; }
 html.mm-open .oib { display: none; }
-/* 키가 작은 휴대폰: 메뉴 맨 아래 "화면 버전" 스위치까지 한 화면에 들어오도록 간격을 줄임 */
-@media (max-height: 820px) {
-  .mm-in { padding-top: calc(84px + env(safe-area-inset-top)); padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
-  .mm-item { padding: clamp(8px, 1.6vh, 14px) 0; gap: 12px; }
-  .mm-txt b { font-size: clamp(28px, 8.4vw, 40px); }
-  .mm-txt small { font-size: 12.5px; }
-  .mm-foot { padding-top: 16px; }
-  .mm-foot a { height: 40px; }
-  .mm-mode { margin-top: 10px; padding-top: 10px; }
-}
-@media (max-height: 640px) {
-  .mm-in { padding-top: calc(76px + env(safe-area-inset-top)); }
-  .mm-kick { margin-bottom: 6px; }
-  .mm-txt b { font-size: 26px; }
-  .mm-txt small { display: none; }
-  .mm-item { padding: 9px 0; }
-}
+
+/* ---------- v11: 휴대폰 메뉴 크기 고정 ----------
+   카톡 등은 손가락이 닿을 때마다 위아래 막대가 접혔다 펴지며 화면 높이가 바뀝니다.
+   메뉴 간격이 화면 높이(vh)나 높이 조건에 따라 달라지면 메뉴가 커졌다 작아졌다 하므로, 높이와 상관없는 고정 크기를 씁니다.
+   (키가 아주 작은 폰에서 아래가 넘치면 메뉴 안에서 스크롤됨) */
+.mm-item { padding: 20px 0; }

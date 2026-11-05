@@ -1,16 +1,17 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { FaGithub, FaEnvelope, FaArrowRight } from "react-icons/fa6";
+import { FaGithub, FaEnvelope, FaArrowRight, FaBolt, FaWandMagicSparkles } from "react-icons/fa6";
 import { PROFILE } from "../data/profile";
 import { gsap, lenisRef, lockScroll } from "../lib/gsap";
 import { lite, FULL } from "../lib/env";
 
 const EASE = [0.16, 1, 0.3, 1];
 // 메뉴 판이 열리고 닫히는 모습.
-// 컴퓨터: 버튼에서 원이 퍼지듯 열림(clip-path). 휴대폰: 원형 clip-path는 화면 전체를 매 프레임 다시 그려야 해서
-// 깜박임이 생기므로, 투명도 + 살짝 내려오기(transform)로 엽니다.
+// 컴퓨터: 버튼에서 원이 퍼지듯 열림(clip-path). 휴대폰: 원형 clip-path는 화면 전체를 매 프레임 다시 그려야 해서 쓰지 않습니다.
 const PANEL = lite
-  ? { initial: { opacity: 0, y: -16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } }
+  // 휴대폰: 메뉴 판이 반투명해지는 순간 뒤 화면이 비쳐 보여서, 판은 열 때 바로 불투명하게 나타나고(안의 글자만 차례로 올라옴)
+  // 닫을 때는 투명도 변화 없이 위로 걷혀 올라갑니다.
+  ? { initial: false, animate: { y: 0 }, exit: { y: "-100%", transition: { duration: 0.3, ease: [0.4, 0, 1, 1] } } }
   : { initial: { clipPath: "circle(0% at calc(100% - 46px) 44px)" }, animate: { clipPath: "circle(150% at calc(100% - 46px) 44px)" }, exit: { clipPath: "circle(0% at calc(100% - 46px) 44px)", transition: { duration: 0.5, ease: [0.7, 0, 0.84, 0] } }, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] } };
 
 const DESC = { project: "대표 프로젝트 4개 · 그 밖의 프로젝트", about: "걸어온 길 · 수상", skill: "직접 써 본 기술", board: "의견 남기기" };
@@ -34,6 +35,8 @@ export default function MobileMenu({ open, onClose, links, active }) {
   }, [open, onClose]);
 
   const go = (id) => { pending.current = id; onClose(); };
+  // 화면 버전 바꾸기: 지금과 다른 쪽을 누르면 메뉴를 닫고, 안내 바(ModeBar)와 같은 동작을 실행
+  const switchTo = (full) => { if (full === FULL) return; onClose(); setTimeout(() => window.dispatchEvent(new Event("mode-request")), 320); };
 
   // 닫힘 애니메이션이 끝나고 스크롤 잠금이 풀린 다음에 이동합니다. (닫히는 중에 이동이 겹치면 휴대폰에서 버벅임)
   const afterClose = () => {
@@ -74,12 +77,13 @@ export default function MobileMenu({ open, onClose, links, active }) {
             </motion.div>
             {/* 화면 버전 스위치 (휴대폰·태블릿만): 누르면 메뉴를 닫고 안내 바와 같은 동작(mode-request) */}
             {lite && (
-              <motion.div className="mm-mode" role="group" aria-label="화면 버전" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
-                <span className="mm-mode-k">화면 버전</span>
-                <span className="mm-mode-sw">
-                  <button type="button" aria-pressed={!FULL} className={!FULL ? "on" : ""} onClick={() => { if (FULL) { onClose(); setTimeout(() => window.dispatchEvent(new Event("mode-request")), 300); } }}>간편 모드</button>
-                  <button type="button" aria-pressed={FULL} className={FULL ? "on" : ""} onClick={() => { if (!FULL) { onClose(); setTimeout(() => window.dispatchEvent(new Event("mode-request")), 300); } }}>전체 애니메이션</button>
-                </span>
+              <motion.div className="mm-mode" role="group" aria-label="화면 버전" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.6, ease: EASE }}>
+                <p className="mm-mode-k">화면 버전<small>{FULL ? "PC와 같은 스크롤 연출로 보고 있어요" : "빠르게 훑어보기 좋은 버전이에요"}</small></p>
+                <div className={`mm-mode-sw ${FULL ? "is-full" : ""}`}>
+                  <i className="mm-mode-pill" aria-hidden="true" />
+                  <button type="button" aria-pressed={!FULL} className={!FULL ? "on" : ""} onClick={() => switchTo(false)}><FaBolt aria-hidden="true" />간편 모드</button>
+                  <button type="button" aria-pressed={FULL} className={FULL ? "on" : ""} onClick={() => switchTo(true)}><FaWandMagicSparkles aria-hidden="true" />전체 애니메이션</button>
+                </div>
               </motion.div>
             )}
           </nav>

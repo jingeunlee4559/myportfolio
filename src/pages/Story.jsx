@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaEnvelope, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced, onWidthResize, lite, stableVH } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize, LITE_FX as lite, stableVH } from "../lib/env";
 import { guide, guideZone } from "../lib/guide";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";

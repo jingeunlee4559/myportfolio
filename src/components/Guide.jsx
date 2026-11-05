@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "../lib/gsap";
 import { guide } from "../lib/guide";
-import { reduced, touch, lite } from "../lib/env";
+import { reduced, touch, LITE_FX, FULL } from "../lib/env";
 
-// 휴대폰·태블릿(lite)에서는 따라다니는 점을 쓰지 않습니다. 화면이 좁아 글자와 겹치거나 산만해 보이고,
+// 휴대폰·태블릿 간편 모드에서는 따라다니는 점을 쓰지 않습니다. 화면이 좁아 글자와 겹치거나 산만해 보이고,
 // 매 프레임 위치를 읽는 일이 카톡 같은 느린 브라우저에 부담이라서입니다.
 // 대신 각 제목 끝 자리(.gd-p)에 파란 마침표가 그대로 찍히고, 걸어온 길은 지금 단계의 동그라미가 직접 켜집니다.
 // (html에 gd-live가 없을 때의 모습은 index.css에 이미 준비되어 있음)
-const OFF = reduced || lite;
+const OFF = reduced || LITE_FX;
+// 휴대폰 전체 애니메이션 버전에서는 빛 꼬리까지 PC와 똑같이 그림
+const TRAIL = !touch || FULL;
 
 // 마침표 길잡이를 그리는 층: 파란 점 하나 + 지나간 자리에 남는 짧은 빛 꼬리.
 // 각 장면이 정해 준 "마침표 자리"(요소)의 실제 위치를 매 프레임 읽어 부드럽게 따라갑니다.
@@ -23,7 +25,7 @@ export default function Guide() {
     const c = cv.current, g = c.getContext("2d");
     let W = 0, H = 0, DPR = 1;
     // 휴대폰에서는 빛 꼬리를 그리지 않습니다. (화면 전체를 매 프레임 다시 그리는 작업이라 무거움)
-    const size = () => { W = innerWidth; H = innerHeight; if (touch) return; DPR = Math.min(2, devicePixelRatio || 1); c.width = W * DPR; c.height = H * DPR; };
+    const size = () => { W = innerWidth; H = innerHeight; if (!TRAIL) return; DPR = Math.min(2, devicePixelRatio || 1); c.width = W * DPR; c.height = H * DPR; };
     size(); addEventListener("resize", size);
     // 인트로가 끝나고 히어로 문장이 다 올라온 뒤(약 0.9초) 마침표가 떨어지듯 등장
     let readyAt = window.__introDone ? performance.now() + 900 : Infinity;
@@ -76,7 +78,7 @@ export default function Guide() {
       if (op !== was.op) d.style.opacity = was.op = op;
       if (col !== was.col) d.style.setProperty("--gc", was.col = col);
       // 빛 꼬리: 빠르게 움직일 때만 길게 남음 (휴대폰은 생략)
-      if (touch) return;
+      if (!TRAIL) return;
       const last = trail[trail.length - 1];
       if (P.o > 0.2 && (!last || Math.hypot(last.x - P.x, last.y - P.y) > 1)) trail.push({ x: P.x, y: P.y, t: now, s: P.s });
       while (trail.length && now - trail[0].t > 380) trail.shift();

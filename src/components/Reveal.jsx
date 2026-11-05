@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { lite } from "../lib/env";
+import { LITE_FX as lite } from "../lib/env";
 
 // filter: blur 애니메이션은 휴대폰에서 무거워서, 가벼운 기기에서는 빼고 위치·투명도만 움직입니다.
 const FROM = lite ? {} : { filter: "blur(10px)" };

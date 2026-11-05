@@ -4,13 +4,13 @@ import useEmblaCarousel from "embla-carousel-react";
 import { FaArrowLeft, FaArrowRight, FaArrowsRotate, FaCalendarDays, FaChartPie, FaCheck, FaChevronDown, FaDesktop, FaGithub, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
 import { projects } from "../../data/projects";
 import { THEMES } from "../../data/themes";
-import { lite } from "../../lib/env";
+import { lite, LITE_FX } from "../../lib/env";
 
 const EASE = [0.16, 1, 0.3, 1];
 const ROLE_ICON = { Frontend: FaDesktop, Backend: FaServer, AI: FaRobot };
 const list = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } } };
 // 가벼운 기기에서는 blur 없이 떠오르기만 합니다. (모달 안 스크롤 중 깜박임 방지)
-const item = lite
+const item = LITE_FX
   ? { hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } } }
   : { hidden: { opacity: 0, y: 28, filter: "blur(8px)" }, show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.9, ease: EASE } } };
 // 상세 창이 열리고 닫히는 모습.

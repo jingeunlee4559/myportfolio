@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT, LITE_STATIC, lite, stableVH } from "../lib/env";
+import { STATIC_LAYOUT, LITE_STATIC, LITE_FX as lite, stableVH } from "../lib/env";
 
 // 휴대폰·태블릿에서는 고정 없이 일반 스크롤로 보여줍니다. (내려오면서 한 번 나타나기만)
 const reduced = STATIC_LAYOUT || LITE_STATIC;

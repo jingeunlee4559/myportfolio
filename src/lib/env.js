@@ -73,4 +73,7 @@ const wantFull = typeof location !== "undefined" && new URLSearchParams(location
 export const FULL = lite && wantFull && !inApp;
 export const SIMPLE = lite && !FULL;
 export const LITE_STATIC = SIMPLE;
+// 연출을 줄이는 처리(점 길잡이 끄기, 흐르는 벽 멈춤, 장면 전환 단순화 등)는 간편 모드에서만 씁니다.
+// 전체 애니메이션은 PC 버전을 그대로 반응형으로 보여 주고, 보이는 모습이 같은 안정화 처리(높이 계산·상세 창·메뉴)만 남깁니다.
+export const LITE_FX = SIMPLE;
 if (typeof document !== "undefined" && lite) document.documentElement.dataset.mode = FULL ? "full" : "simple";
