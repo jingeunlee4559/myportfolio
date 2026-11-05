@@ -1665,3 +1665,46 @@ html[data-lite] .mh-flow .st-col { animation: mhUp var(--dur, 50s) linear infini
 html[data-lite] .mh-flow .st-col:nth-child(even) { animation-name: mhDown; }
 html[data-lite] .mh-pause .st-col { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { html[data-lite] .mh-flow .st-col { animation: none; } }
+
+/* =====================================================================
+   v10 — 화면 버전 안내 바 · 메뉴 스위치 · 휴대폰 라벨 점 정리
+   ===================================================================== */
+.oib-go > span { gap: 2px; }
+.oib-copy { justify-self: start; margin-top: 6px; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: #fff; color: #0f1629; font: inherit; font-size: 12.5px; font-weight: 800; cursor: pointer; }
+html.dark .oib-copy { background: #0f1629; color: #fff; }
+.oib-go > svg { align-self: flex-start; margin-top: 3px; }
+
+/* 메뉴 맨 아래: 화면 버전 [간편 모드 | 전체 애니메이션] */
+.mm-mode { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.1); }
+html:not(.dark) .mm-mode { border-top-color: rgba(15,22,41,.1); }
+.mm-mode-k { font-size: 12.5px; font-weight: 700; opacity: .65; }
+.mm-mode-sw { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+html:not(.dark) .mm-mode-sw { background: rgba(15,22,41,.05); box-shadow: inset 0 0 0 1px rgba(15,22,41,.1); }
+.mm-mode-sw button { height: 34px; padding: 0 13px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 12.5px; font-weight: 800; opacity: .6; cursor: pointer; }
+.mm-mode-sw button.on { opacity: 1; background: var(--color-accent); color: #fff; }
+
+/* 휴대폰·태블릿: 따라다니는 점이 없으므로, 짧은 라벨(기술 묶음 이름·단계 이름·프로젝트 이름·사진 이름) 끝의 점은 숨기고
+   문장으로 끝나는 제목 끝의 파란 마침표만 남깁니다. */
+html[data-lite] .sk2-g h3 .gd-p,
+html[data-lite] .st-steps .gd-p,
+html[data-lite] .acc-p h3 .gd-p,
+html[data-lite] .ab-photo figcaption .gd-p,
+html[data-lite] .wa-cap .gd-p { display: none; }
+html.mm-open .oib { display: none; }
+/* 키가 작은 휴대폰: 메뉴 맨 아래 "화면 버전" 스위치까지 한 화면에 들어오도록 간격을 줄임 */
+@media (max-height: 820px) {
+  .mm-in { padding-top: calc(84px + env(safe-area-inset-top)); padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .mm-item { padding: clamp(8px, 1.6vh, 14px) 0; gap: 12px; }
+  .mm-txt b { font-size: clamp(28px, 8.4vw, 40px); }
+  .mm-txt small { font-size: 12.5px; }
+  .mm-foot { padding-top: 16px; }
+  .mm-foot a { height: 40px; }
+  .mm-mode { margin-top: 10px; padding-top: 10px; }
+}
+@media (max-height: 640px) {
+  .mm-in { padding-top: calc(76px + env(safe-area-inset-top)); }
+  .mm-kick { margin-bottom: 6px; }
+  .mm-txt b { font-size: 26px; }
+  .mm-txt small { display: none; }
+  .mm-item { padding: 9px 0; }
+}

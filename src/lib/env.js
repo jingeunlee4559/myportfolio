@@ -57,7 +57,20 @@ export function stableVH() {
 
 // 휴대폰·태블릿(lite)에서는 대표 프로젝트 영역을 휴대폰 전용 화면(MobileFeatured)으로 바꾸고,
 // 그 밖의 프로젝트는 고정 없이 보여줍니다. 기술 스택만 PC와 같은 고정 연출을 씁니다.
-export const LITE_STATIC = lite;
-// 카카오톡 안 브라우저인지 ("브라우저로 열기" 안내에 사용)
+// 카카오톡·앱 안 브라우저, 기기 종류 ("전체 애니메이션 보기" 안내에 사용)
 export const isKakao = /KAKAOTALK/i.test(ua);
+export const isLine = /Line\//i.test(ua);
 export const isAndroid = /Android/i.test(ua);
+export const isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && (nav.maxTouchPoints || 0) > 1);
+
+// ── 화면 버전 (휴대폰·태블릿만) ─────────────────────────────
+// 휴대폰·태블릿은 어디서 열든 처음에는 무조건 "간편 모드"(대표 프로젝트 = 휴대폰 전용 카드)로 시작합니다.
+// 화면 아래 안내 바나 메뉴의 스위치로 "전체 애니메이션"을 고르면 주소에 ?full=1을 붙여 다시 열고,
+// 그때만 PC와 같은 스크롤 장면을 씁니다. (선택은 기억하지 않음: 새로 열면 다시 간편 모드)
+// 카톡 같은 앱 안 브라우저에서는 성능이 제한돼 전체 버전을 켜지 않고, 일반 브라우저로 옮겨서 보여 줍니다.
+// 전체 버전에서도 휴대폰용 안정화 처리(흐림·노이즈 끄기, 높이 계산 등, html[data-lite])는 그대로 둡니다.
+const wantFull = typeof location !== "undefined" && new URLSearchParams(location.search).get("full") === "1";
+export const FULL = lite && wantFull && !inApp;
+export const SIMPLE = lite && !FULL;
+export const LITE_STATIC = SIMPLE;
+if (typeof document !== "undefined" && lite) document.documentElement.dataset.mode = FULL ? "full" : "simple";

@@ -16,8 +16,8 @@ import Guide from "./components/Guide";
 import Cursor from "./components/Cursor";
 import { CHAPTERS } from "./data/story";
 import MobileFeatured from "./pages/MobileFeatured";
-import OpenInBrowser from "./components/OpenInBrowser";
-import { lite } from "./lib/env";
+import ModeBar from "./components/ModeBar";
+import { SIMPLE } from "./lib/env";
 
 // 방명록은 Firebase를 쓰므로 필요할 때 따로 불러옵니다. (첫 화면 JS 크기 줄이기)
 const CommentBoard = lazy(() => import("./components/CommentBoard"));
@@ -31,8 +31,8 @@ export default function App() {
       <Intro />
       <Navs />
       <main className="page-bg relative z-10 rounded-b-[48px]">
-        {/* 휴대폰·태블릿: 대표 프로젝트를 고정 스크롤 장면 대신 전용 화면으로 (PC는 기존 장면 그대로) */}
-        {lite ? (
+        {/* 휴대폰·태블릿 간편 모드: 대표 프로젝트를 고정 스크롤 장면 대신 전용 화면으로 (PC·전체 애니메이션은 기존 장면) */}
+        {SIMPLE ? (
           <div data-nav="project"><MobileFeatured /></div>
         ) : (
           <>
@@ -53,7 +53,7 @@ export default function App() {
       <ModalHost />
       <Guide />
       <Cursor />
-      <OpenInBrowser />
+      <ModeBar />
       <Analytics />
     </MotionConfig>
   );

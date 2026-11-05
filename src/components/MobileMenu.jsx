@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { FaGithub, FaEnvelope, FaArrowRight } from "react-icons/fa6";
 import { PROFILE } from "../data/profile";
 import { gsap, lenisRef, lockScroll } from "../lib/gsap";
-import { lite } from "../lib/env";
+import { lite, FULL } from "../lib/env";
 
 const EASE = [0.16, 1, 0.3, 1];
 // 메뉴 판이 열리고 닫히는 모습.
@@ -24,11 +24,13 @@ export default function MobileMenu({ open, onClose, links, active }) {
   useEffect(() => {
     if (!open) return;
     lockScroll(true);
+    // 메뉴가 열려 있는 동안 화면 아래 안내 바를 숨김 (메뉴 맨 아래 "화면 버전" 스위치를 가리지 않게)
+    document.documentElement.classList.add("mm-open");
     // 메뉴가 덮고 있는 동안은 뒤 페이지의 GSAP 연출을 멈춰, 메뉴 애니메이션이 끊기지 않게 합니다.
     gsap.globalTimeline.pause();
     const esc = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", esc);
-    return () => { gsap.globalTimeline.resume(); lockScroll(false); window.removeEventListener("keydown", esc); };
+    return () => { document.documentElement.classList.remove("mm-open"); gsap.globalTimeline.resume(); lockScroll(false); window.removeEventListener("keydown", esc); };
   }, [open, onClose]);
 
   const go = (id) => { pending.current = id; onClose(); };
@@ -70,6 +72,16 @@ export default function MobileMenu({ open, onClose, links, active }) {
               {PROFILE.email && <a href={`mailto:${PROFILE.email}`}><FaEnvelope aria-hidden="true" />{PROFILE.email}</a>}
               <a href={PROFILE.githubPortfolio} target="_blank" rel="noopener noreferrer"><FaGithub aria-hidden="true" />GitHub</a>
             </motion.div>
+            {/* 화면 버전 스위치 (휴대폰·태블릿만): 누르면 메뉴를 닫고 안내 바와 같은 동작(mode-request) */}
+            {lite && (
+              <motion.div className="mm-mode" role="group" aria-label="화면 버전" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
+                <span className="mm-mode-k">화면 버전</span>
+                <span className="mm-mode-sw">
+                  <button type="button" aria-pressed={!FULL} className={!FULL ? "on" : ""} onClick={() => { if (FULL) { onClose(); setTimeout(() => window.dispatchEvent(new Event("mode-request")), 300); } }}>간편 모드</button>
+                  <button type="button" aria-pressed={FULL} className={FULL ? "on" : ""} onClick={() => { if (!FULL) { onClose(); setTimeout(() => window.dispatchEvent(new Event("mode-request")), 300); } }}>전체 애니메이션</button>
+                </span>
+              </motion.div>
+            )}
           </nav>
         </motion.div>
       )}
