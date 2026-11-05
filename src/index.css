@@ -1715,3 +1715,14 @@ html[data-lite] .mm { height: calc(100lvh + 120px); }
 /* 화면 밖 그리기 미루기: 방명록 글 목록처럼 페이지 아래쪽의 긴 목록은 화면 근처에 왔을 때 그립니다.
    (스크롤 연출 위치 계산에 영향을 주지 않는 곳에만 적용) */
 html[data-lite] .gb-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+
+/* ---------- v15: 메뉴가 열려 있는 동안 뒤 페이지 숨기기 ----------
+   카톡 막대가 움직여 화면 크기가 바뀌는 순간 메뉴 배경이 늦게 그려져 뒤 화면(히어로 이미지 벽)이 비치던 문제.
+   뒤 페이지와 흐르는 이미지 벽을 숨기고, 바탕색을 메뉴와 같은 색으로 맞춰 그 순간에도 차이가 보이지 않게 합니다. */
+/* visibility만으로는 안쪽에 "보이기"가 따로 지정된 글자(히어로 문장 등)가 남아서, 투명도 0을 함께 씀 */
+html.mm-open main, html.mm-open footer, html.mm-open .gd-dot, html.mm-open .gd-trail { visibility: hidden; opacity: 0; }
+html.mm-open .mh-flow .st-col { animation-play-state: paused; }
+html.mm-open, html.mm-open body { background: #0b1330; }
+html.mm-open:not(.dark), html.mm-open:not(.dark) body { background: #eef4ff; }
+.mm { background-color: #0b1330; }
+html:not(.dark) .mm { background-color: #f3f7ff; }

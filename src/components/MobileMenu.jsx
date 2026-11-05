@@ -33,8 +33,8 @@ export default function MobileMenu({ open, onClose, links, active }) {
     const esc = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", esc);
 
-    // 메뉴가 화면에 다 들어가 있으면 손가락으로 끄는 동작을 막습니다.
-    // (카톡 등은 끌 때마다 위아래 막대를 접었다 펴며 화면 전체를 들썩이게 하므로)
+    // 메뉴가 열려 있는 동안 화면 어디를 끌어도(위쪽 바 포함) 끌기를 막습니다.
+    // (카톡 등은 끌 때마다 위아래 막대를 접었다 펴며 화면 크기를 바꾸므로)
     // 넘치는 짧은 화면에서는 메뉴 안 스크롤만 허용합니다. 누르기(탭)는 그대로 됩니다.
     const el = panel.current;
     const inner = el?.querySelector(".mm-in");
@@ -42,9 +42,15 @@ export default function MobileMenu({ open, onClose, links, active }) {
       const fits = !inner || inner.scrollHeight <= inner.clientHeight + 1;
       if (fits || !inner.contains(e.target)) e.preventDefault();
     };
-    el?.addEventListener("touchmove", block, { passive: false });
+    document.addEventListener("touchmove", block, { passive: false });
 
-    return () => { el?.removeEventListener("touchmove", block); gsap.globalTimeline.resume(); lockScroll(false); window.removeEventListener("keydown", esc); };
+    // 메뉴 뒤 페이지를 숨깁니다. 카톡 막대가 나타나 화면 크기가 바뀌는 순간, 폰이 메뉴 배경을 한두 프레임 늦게 그려
+    // 그 사이 뒤의 히어로 이미지 벽이 비쳐 보였습니다. 뒤 페이지가 숨겨져 있으면 그 순간에도 보일 것이 없습니다.
+    // (메뉴가 화면에 그려진 다음 프레임에 숨겨, 여는 순간 빈 화면이 끼지 않게)
+    const html = document.documentElement;
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => html.classList.add("mm-open")));
+
+    return () => { cancelAnimationFrame(raf); html.classList.remove("mm-open"); document.removeEventListener("touchmove", block); gsap.globalTimeline.resume(); lockScroll(false); window.removeEventListener("keydown", esc); };
   }, [open, onClose]);
 
   const go = (id) => { pending.current = id; onClose(); };
