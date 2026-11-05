@@ -13,7 +13,9 @@ import MailLine from "../components/MailLine";
 // 같은 디자인(글꼴·색·노트북 프레임·버튼)을 그대로 쓰되, 스크롤에 묶이지 않는 화면으로 따로 만들었습니다.
 //  · 히어로: 문장이 한 줄씩 올라오고 마침표가 떨어짐 (이미지 벽은 멈춘 채 배경으로)
 //  · 대표 프로젝트: 같은 형식의 카드 4장. 화면에 처음 들어올 때 한 번만 옆·아래에서 미끄러져 들어옴
-//    노트북 속 화면은 손가락으로 좌우로 넘겨 메인·기능 화면을 볼 수 있음 (브라우저 기본 scroll-snap, 스크롤 계산 없음)
+//    노트북 속 화면은 보이는 동안 3초마다 자동으로 넘어가고, 손가락으로 좌우로 넘길 수도 있음 (브라우저 기본 scroll-snap)
+//    설명은 번호 → 수상 → 제목 → 기능 1·2·3 → 버튼 순서로 차례차례 올라옴
+//  · 히어로: 내릴 때 문장은 살짝 늦게 올라가며 흐려지고, 뒤 이미지 벽은 천천히 따라옴 (CSS 스크롤 연동, 지원 브라우저에서만)
 // 프로젝트 내용은 data/ 폴더의 같은 데이터를 쓰므로, 내용을 고칠 때는 한 곳만 고치면 됩니다.
 // ───────────────────────────────────────────────────────────────
 
@@ -51,10 +53,34 @@ function Laptop({ card, cls }) {
   };
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
   const goTo = (i) => { const el = strip.current; if (el) el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" }); };
+
+  // 자동 넘김: 카드가 화면에 보이는 동안 3초마다 다음 화면으로 (마지막 다음은 처음으로).
+  //  · 손으로 넘기거나 점을 누르면 그 카드는 자동 넘김을 멈춤 (사용자가 직접 보는 중이므로)
+  //  · 화면 밖, 다른 탭, 메뉴·상세 창이 열려 있을 때는 멈춤 / "동작 줄이기" 설정이면 처음부터 안 함
+  const stopped = useRef(false);
+  const stop = () => { stopped.current = true; };
+  useEffect(() => {
+    const el = strip.current;
+    if (!many || !el || reduced || !("IntersectionObserver" in window)) return;
+    let visible = false, timer = 0;
+    const busy = () => document.hidden || document.documentElement.classList.contains("mm-open") || document.querySelector(".pm-shell");
+    const tick = () => {
+      if (stopped.current || !visible || busy()) return;
+      const n = card.slides.length, i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+      el.scrollTo({ left: ((i + 1) % n) * el.clientWidth, behavior: "smooth" });
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      clearInterval(timer);
+      if (visible && !stopped.current) timer = setInterval(tick, 3000);
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => { io.disconnect(); clearInterval(timer); };
+  }, [many, card.slides.length]);
   return (
     <div className={`mf-lap ${cls}`}>
       <div className="chp-lap">
-        <div ref={strip} className="chp-screen mf-strip" onScroll={many ? onScroll : undefined} aria-label={many ? `${card.name} 화면 ${card.slides.length}장, 옆으로 넘겨 보기` : undefined}>
+        <div ref={strip} className="chp-screen mf-strip" onScroll={many ? onScroll : undefined} onTouchStart={stop} onWheel={stop} aria-label={many ? `${card.name} 화면 ${card.slides.length}장, 옆으로 넘겨 보기` : undefined}>
           {card.slides.map((s, k) => (
             <button key={k} type="button" className="mf-slide" onClick={() => openProject(card.idx)} aria-label={`${card.name} ${s.title} · 자세히 보기`}>
               <img className="mf-img" src={s.img} alt="" loading="lazy" decoding="async" />
@@ -66,7 +92,7 @@ function Laptop({ card, cls }) {
       {many && (
         <div className="mf-dots">
           <span className="mf-dots-k">{card.slides[cur]?.title}</span>
-          <span className="mf-dots-i">{card.slides.map((s, k) => <button key={k} type="button" className={k === cur ? "on" : ""} onClick={() => goTo(k)} aria-label={`${k + 1}번째 화면: ${s.title}`} aria-current={k === cur} />)}</span>
+          <span className="mf-dots-i">{card.slides.map((s, k) => <button key={k} type="button" className={k === cur ? "on" : ""} onClick={() => { stop(); goTo(k); }} aria-label={`${k + 1}번째 화면: ${s.title}`} aria-current={k === cur} />)}</span>
         </div>
       )}
     </div>
@@ -168,12 +194,12 @@ export default function MobileFeatured() {
               ) : (
                 <div className="mf-dev"><Laptop card={card} cls={card.from === "r" ? "mf-from-r" : "mf-from-l"} /></div>
               )}
-              <div className="mf-text mf-from-b">
-                <p className="st-kicker">PROJECT {String(n + 1).padStart(2, "0")} / {String(FEATURED).padStart(2, "0")}</p>
-                <p className="st-eyebrow">{card.key === "webapp" ? "YOLO" : card.name}{award && <span className="st-aw">{award}</span>}</p>
-                <h2 className="st-h2">{card.title.map((t, i) => <span key={i} className="block">{t}{i === card.title.length - 1 && <i className="gd-p" aria-hidden="true" />}</span>)}</h2>
-                <ol className="st-steps">{card.steps.map((s, k) => <li key={k}><b><em>{String(k + 1).padStart(2, "0")}</em>{s.title}</b><span>{s.text}</span></li>)}</ol>
-                <button type="button" className="st-more" onClick={() => openProject(card.idx)}>자세히 보기 <FaArrowRight aria-hidden="true" /></button>
+              <div className="mf-text mf-stg">
+                <p className="st-kicker" style={{ "--i": 0 }}>PROJECT {String(n + 1).padStart(2, "0")} / {String(FEATURED).padStart(2, "0")}</p>
+                <p className="st-eyebrow" style={{ "--i": 1 }}>{card.key === "webapp" ? "YOLO" : card.name}{award && <span className="st-aw">{award}</span>}</p>
+                <h2 className="st-h2" style={{ "--i": 2 }}>{card.title.map((t, i) => <span key={i} className="block">{t}{i === card.title.length - 1 && <i className="gd-p" aria-hidden="true" />}</span>)}</h2>
+                <ol className="st-steps">{card.steps.map((s, k) => <li key={k} style={{ "--i": 3 + k }}><b><em>{String(k + 1).padStart(2, "0")}</em>{s.title}</b><span>{s.text}</span></li>)}</ol>
+                <button type="button" className="st-more" style={{ "--i": 3 + card.steps.length }} onClick={() => openProject(card.idx)}>자세히 보기 <FaArrowRight aria-hidden="true" /></button>
               </div>
             </article>
           );
