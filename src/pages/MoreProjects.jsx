@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, ScrollTrigger, NARROW_MQ, sortTriggers } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced, LITE_STATIC, stableVH } from "../lib/env";
 import { guideZone } from "../lib/guide";
 import { projects } from "../data/projects";
 import { THEMES } from "../data/themes";
@@ -28,11 +28,12 @@ export default function MoreProjects() {
       // 마침표 길잡이: 제목 끝 → 펼쳐진 프로젝트 이름 끝
       guideZone(root.current, () => {
         const el = root.current, t = el.querySelector(".acc-title .gd-p");
-        const head = c.conditions.narrowQ ? t.getBoundingClientRect().top > window.innerHeight * 0.3 : pr.current < 0.06;
+        const head = c.conditions.narrowQ || LITE_STATIC ? t.getBoundingClientRect().top > window.innerHeight * 0.3 : pr.current < 0.06;
         return head ? t : el.querySelectorAll(".acc-p h3 .gd-p")[onRef.current];
       });
       gsap.fromTo(".acc-head > *", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 82%" } });
-      if (c.conditions.narrowQ) {
+      // 휴대폰과 태블릿(가로 포함)은 고정 없이, 카드가 차례로 떠오르기만 합니다.
+      if (c.conditions.narrowQ || LITE_STATIC) {
         gsap.fromTo(".acc-p", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: ".acc-row", start: "top 85%" } });
         gsap.utils.toArray(".acc-p").forEach((el, i) => gsap.timeline({ scrollTrigger: { trigger: el, start: "top 55%", end: "bottom 45%", onToggle: (st) => st.isActive && setOn(i) } }));
         return;
@@ -41,7 +42,7 @@ export default function MoreProjects() {
       gsap.fromTo(".acc-p", { clipPath: "inset(100% 0% 0% 0% round 26px)" }, { clipPath: "inset(0% 0% 0% 0% round 26px)", ease: "power2.out", stagger: 0.08, scrollTrigger: { trigger: root.current, start: "top 95%", end: "top 15%", scrub: 0.6 } });
       gsap.timeline({
         scrollTrigger: {
-          trigger: root.current, start: "top top", end: () => `+=${window.innerHeight * 2}`, pin: ".acc-stage", scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+          trigger: root.current, start: "top top", end: () => `+=${stableVH() * 2}`, pin: ".acc-stage", scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
           onUpdate: (st) => { pr.current = st.progress; if (!hover.current) setOn(Math.min(MORE.length - 1, Math.floor(st.progress * MORE.length * 0.999))); },
         },
       }).fromTo(".acc-bar i", { scaleX: 0 }, { scaleX: 1, ease: "none" });

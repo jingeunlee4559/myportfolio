@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaEnvelope, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced, onWidthResize, lite } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize, lite, stableVH } from "../lib/env";
 import { guide, guideZone } from "../lib/guide";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
@@ -27,7 +27,8 @@ const isMobile = narrow;
 // 진행도(0~1) 구간: 이 값에 따라 단계가 바뀝니다.
 const STEP_AT = [0.5, 0.64, 0.8];
 // 고정 구간 길이 (화면 높이의 몇 배)
-const PIN = () => (isMobile() ? 3.1 : 3.6);
+// 휴대폰·태블릿은 손가락 몇 번에 지나가도록 고정 구간을 짧게 둡니다.
+const PIN = () => (lite ? 2.4 : isMobile() ? 3.1 : 3.6);
 
 // 카드·노트북 화면이 놓일 자리는 CSS의 보이지 않는 자리표시(.st-slot-c, .st-slot-r)가 정합니다.
 // JS는 그 자리를 읽어 오기만 하므로, 화면 크기가 바뀌어도 CSS가 정한 자리로 다시 맞춰집니다.
@@ -110,7 +111,7 @@ export default function Story() {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: wrap.current, start: "top top", end: () => `+=${window.innerHeight * PIN()}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
+          trigger: wrap.current, start: "top top", end: () => `+=${stableVH() * PIN()}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
           // 화면 크기가 바뀌면(휴대폰 ↔ 컴퓨터 포함) 시작·끝 자리를 다시 계산하고, 지금 진행도에 맞는 자리로 맞춤
           onRefresh: () => { measure(); apply(); },
           onUpdate: (st) => {
@@ -152,12 +153,15 @@ export default function Story() {
       // 노트북 속 화면이 아래에서 위로 쓸어 올리듯 바뀌고, 앞 화면은 살짝 작아지며 어두워짐
       const scr = gsap.utils.toArray(".st-scr");
       STEP_AT.forEach((at, k) => {
+        // 휴대폰·태블릿: 쓸어 올리기(clip-path) 대신 부드러운 교차 페이드
+        if (lite) { tl.fromTo(scr[k + 1], { opacity: 0 }, { opacity: 1, duration: 0.05, immediateRender: false }, at); return; }
         tl.fromTo(scr[k + 1], { clipPath: "inset(100% 0% 0% 0%)", scale: 1.12, opacity: 1 }, { clipPath: "inset(0% 0% 0% 0%)", scale: 1, opacity: 1, duration: 0.05, ease: "power2.out", immediateRender: false }, at)
           // 앞 화면 어둡게(filter)는 휴대폰에서 노트북 화면이 하얗게 깜박이는 원인이라, 가벼운 기기에서는 작아지기만 합니다.
           .fromTo(scr[k], lite ? { scale: 1 } : { scale: 1, filter: "brightness(1)" }, lite ? { scale: 0.94, duration: 0.05, immediateRender: false } : { scale: 0.94, filter: "brightness(0.55)", duration: 0.05, immediateRender: false }, at);
       });
       // 뒤에 깔린 큰 프로젝트 이름
-      tl.fromTo(".st-bgw", { opacity: 0, xPercent: 10 }, { opacity: 1, xPercent: -10, duration: 0.2, immediateRender: false }, 0.34)
+      // (휴대폰·태블릿은 뒤에 흐르는 큰 글자를 생략: 화면이 작아 잘 보이지 않는데 매 프레임 움직여 부담)
+      if (!lite) tl.fromTo(".st-bgw", { opacity: 0, xPercent: 10 }, { opacity: 1, xPercent: -10, duration: 0.2, immediateRender: false }, 0.34)
         .fromTo(".st-bgw", { xPercent: -10 }, { xPercent: -30, duration: 0.42, immediateRender: false }, 0.54);
       tl.to({}, { duration: 0.06 }, 0.94);
       // 화면 크기가 바뀌는 즉시 자리 다시 읽기 (스크롤 연출 전체 재계산은 ScrollTrigger가 이어서 함)

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaBell } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize, stableVH, lite } from "../lib/env";
 import { guideZone } from "../lib/guide";
 import { WEBAPP as D, FEATURED } from "../data/story";
 
@@ -59,7 +59,7 @@ export default function WebApp() {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: wrap.current, start: "top top", end: () => `+=${window.innerHeight * (narrow() ? 2.1 : 2.4)}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
+          trigger: wrap.current, start: "top top", end: () => `+=${stableVH() * (lite ? 1.6 : narrow() ? 2.1 : 2.4)}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
           onRefresh: () => { measure(); apply(); },
           onUpdate: (st) => { prog.current = st.progress; const n = st.progress > 0.8 ? 1 : 0; if (n !== last) { last = n; setApp(n); } },
         },

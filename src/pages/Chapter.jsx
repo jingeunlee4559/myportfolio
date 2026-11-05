@@ -2,7 +2,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT as reduced, lite } from "../lib/env";
+import { STATIC_LAYOUT, LITE_STATIC, lite, stableVH } from "../lib/env";
+
+// 휴대폰·태블릿에서는 고정 없이 일반 스크롤로 보여줍니다. (내려오면서 한 번 나타나기만)
+const reduced = STATIC_LAYOUT || LITE_STATIC;
 import { projects } from "../data/projects";
 import { THEMES } from "../data/themes";
 import { FEATURED } from "../data/story";
@@ -22,6 +25,15 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
   // 단계가 바뀌는 진행도: 영상이 있으면 영상 → 1 → 2 → 3, 없으면 바로 1단계부터
   const AT = hasVid ? [0.3, 0.55, 0.78] : [0.1, 0.45, 0.74];
 
+  // 일반 스크롤 배치일 때: 화면에 들어오면 노트북과 설명이 한 번 떠오르기만 합니다. (스크롤에 묶이지 않아 가벼움)
+  useLayoutEffect(() => {
+    if (!LITE_STATIC || STATIC_LAYOUT) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo([".chp-dev", ".chp-text > *"], { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.06, ease: "power2.out", scrollTrigger: { trigger: sec.current, start: "top 80%", once: true } });
+    }, sec);
+    return () => ctx.revert();
+  }, []);
+
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
@@ -29,7 +41,7 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: wrap.current, start: "top top", end: () => `+=${window.innerHeight * (narrow() ? 1.7 : 1.9)}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
+          trigger: wrap.current, start: "top top", end: () => `+=${stableVH() * (narrow() ? 1.7 : 1.9)}`, pin: sec.current, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
           onUpdate: (st) => {
             const q = st.progress, s = q < AT[0] ? -1 : q < AT[1] ? 0 : q < AT[2] ? 1 : 2;
             if (s !== last) { last = s; stepRef.current = s; setStep(s); }

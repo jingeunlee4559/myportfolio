@@ -2,7 +2,10 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { layers } from "../data/skills";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
+import { STATIC_LAYOUT, LITE_STATIC, onWidthResize, stableVH } from "../lib/env";
+
+// 휴대폰·태블릿에서는 별이 모이는 고정 연출 없이, 모든 기술 묶음을 켠 채 일반 스크롤로 보여줍니다.
+const reduced = STATIC_LAYOUT || LITE_STATIC;
 
 // 기술 — 세 번째 장(CHAPTER 03): 밤하늘 별자리
 //  ① 밝은 화면 위로 남색 카드가 올라와 화면을 꽉 채우며 밤하늘이 됨 (인트로의 밤하늘과 이어짐)
@@ -49,7 +52,7 @@ export default function Skills() {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: wrap.current, start: "top top", end: () => `+=${window.innerHeight * (narrow() ? 2 : 2.3)}`, pin: sec.current, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
+          trigger: wrap.current, start: "top top", end: () => `+=${stableVH() * (narrow() ? 2 : 2.3)}`, pin: sec.current, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
           onUpdate: (st) => {
             const p = (pr.current = st.progress);
             const n = p < A ? -1 : Math.min(N - 1, Math.floor(((p - A) / (1 - A)) * N));

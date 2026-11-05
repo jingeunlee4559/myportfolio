@@ -27,6 +27,7 @@ export default function Guide() {
     const trail = [];
     let shown = false, prevEl = null;
     const off = { x: 0, y: 0 };
+    const was = { tf: "", sz: "", op: "", col: "" };
     const tick = (_, dt) => {
       const now = performance.now();
       const el = now > readyAt ? guide.resolve() : null;
@@ -60,10 +61,14 @@ export default function Guide() {
       P.r += (tone[0] - P.r) * 0.15; P.g += (tone[1] - P.g) * 0.15; P.b += (tone[2] - P.b) * 0.15;
       const col = `${P.r | 0},${P.g | 0},${P.b | 0}`;
       const d = dot.current;
-      d.style.transform = `translate3d(${(P.x - P.s / 2).toFixed(2)}px, ${(P.y - P.s / 2).toFixed(2)}px, 0)`;
-      d.style.width = d.style.height = `${P.s.toFixed(2)}px`;
-      d.style.opacity = P.o.toFixed(3);
-      d.style.setProperty("--gc", col);
+      // 값이 실제로 바뀔 때만 스타일을 씁니다. 특히 width/height는 쓸 때마다 페이지 배치를 다시 계산하게 만들어
+      // (다음 프레임의 getBoundingClientRect가 전체 배치 계산을 강제) 휴대폰 스크롤이 끊기는 원인이었습니다.
+      const tf = `translate3d(${(P.x - P.s / 2).toFixed(1)}px, ${(P.y - P.s / 2).toFixed(1)}px, 0)`;
+      const sz = `${P.s.toFixed(1)}px`, op = P.o.toFixed(2);
+      if (tf !== was.tf) d.style.transform = was.tf = tf;
+      if (sz !== was.sz) d.style.width = d.style.height = was.sz = sz;
+      if (op !== was.op) d.style.opacity = was.op = op;
+      if (col !== was.col) d.style.setProperty("--gc", was.col = col);
       // 빛 꼬리: 빠르게 움직일 때만 길게 남음 (휴대폰은 생략)
       if (touch) return;
       const last = trail[trail.length - 1];

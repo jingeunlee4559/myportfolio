@@ -32,3 +32,25 @@ export function onWidthResize(fn) {
     fn();
   };
 }
+
+// 고정(pin) 구간 길이를 정할 때 쓰는 "흔들리지 않는 화면 높이".
+// 휴대폰은 주소창이 접혔다 펴질 때마다 innerHeight가 바뀝니다. 그 값으로 구간 길이를 계산하면,
+// 이미지·방명록이 늦게 불러와져 다시 계산할 때 구간 길이가 달라져 보고 있던 장면이 앞뒤로 튑니다.
+// 주소창이 접혔을 때 기준 높이(100lvh)는 주소창과 상관없이 일정하므로 이 값을 씁니다.
+let probe = null;
+export function stableVH() {
+  if (typeof document === "undefined") return 800;
+  if (!touch) return window.innerHeight;
+  if (!probe) {
+    probe = document.createElement("div");
+    probe.setAttribute("aria-hidden", "true");
+    probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none";
+    document.body.appendChild(probe);
+  }
+  return probe.offsetHeight || window.innerHeight;
+}
+
+// 휴대폰·태블릿(lite)에서는 고정(pin) 스크롤 장면을 히어로·웹앱 두 개만 남기고,
+// 나머지 장면(웨딩·신호등 챕터, 그 밖의 프로젝트, 기술)은 고정 없이 일반 스크롤로 보여줍니다.
+// 고정 장면이 이어질수록 휴대폰에서 끊김·장면 튐·탭 빗나감이 생기기 쉬워서입니다.
+export const LITE_STATIC = lite;

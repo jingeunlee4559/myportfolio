@@ -31,12 +31,20 @@ export default function About() {
       gsap.fromTo(".ab-head .ab-kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-head", start: "top 85%" } });
       gsap.fromTo(".ab-rule", { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: "expo.out", delay: 0.2, scrollTrigger: { trigger: ".ab-head", start: "top 80%" } });
       // ② 점에서 사진이 동그랗게 열림
-      gsap.fromTo(".ab-photo", { clipPath: "circle(2.5% at 50% 50%)" }, { clipPath: "circle(75% at 50% 50%)", ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "center 42%", scrub: 0.6 } });
-      gsap.fromTo(".ab-photo img", { scale: 1.35 }, { scale: 1, ease: "none", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "bottom 30%", scrub: 0.6 } });
-      gsap.fromTo(".ab-photo figcaption > *", { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.08, ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 50%", end: "center 36%", scrub: 0.6 } });
-      gsap.fromTo(".ab-halo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 60%", end: "center 35%", scrub: 0.6 } });
+      // 휴대폰·태블릿: 큰 사진에 원형 clip-path를 스크롤마다 다시 그리면 무거워서, 한 번 떠오르기로 바꿉니다.
+      if (lite) gsap.fromTo(".ab-photo", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "top 80%", once: true } });
+      else {
+        gsap.fromTo(".ab-photo", { clipPath: "circle(2.5% at 50% 50%)" }, { clipPath: "circle(75% at 50% 50%)", ease: "power2.out", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "center 42%", scrub: 0.6 } });
+        gsap.fromTo(".ab-photo img", { scale: 1.35 }, { scale: 1, ease: "none", scrollTrigger: { trigger: ".ab-photo", start: "center 70%", end: "bottom 30%", scrub: 0.6 } });
+      }
+      // 휴대폰·태블릿은 스크롤에 묶인(scrub) 연출 대신, 화면에 들어올 때 한 번만 재생합니다.
+      const once = (trigger, start) => (lite ? { trigger, start, once: true } : null);
+      gsap.fromTo(".ab-photo figcaption > *", { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.08, ease: "power2.out", ...(lite ? { duration: 0.7 } : {}), scrollTrigger: once(".ab-photo", "center 70%") || { trigger: ".ab-photo", start: "center 50%", end: "center 36%", scrub: 0.6 } });
+      gsap.fromTo(".ab-halo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, ease: "power2.out", ...(lite ? { duration: 0.8 } : {}), scrollTrigger: once(".ab-photo", "center 70%") || { trigger: ".ab-photo", start: "center 60%", end: "center 35%", scrub: 0.6 } });
       gsap.fromTo(".ab-copy .ab-label", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-copy", start: "top 80%" } });
-      gsap.fromTo(".ab-fw", { opacity: 0.16 }, { opacity: 1, stagger: 0.05, ease: "none", scrollTrigger: { trigger: ".ab-copy", start: "top 75%", end: "bottom 50%", scrub: 0.5 } });
+      // 소개 글이 단어마다 차례로 진해지는 효과: 단어 수십 개를 매 프레임 바꾸므로 휴대폰에서는 한 번에 짧게 재생
+      if (lite) gsap.fromTo(".ab-fw", { opacity: 0.16 }, { opacity: 1, duration: 0.9, stagger: 0.012, ease: "power1.out", scrollTrigger: { trigger: ".ab-copy", start: "top 75%", once: true } });
+      else gsap.fromTo(".ab-fw", { opacity: 0.16 }, { opacity: 1, stagger: 0.05, ease: "none", scrollTrigger: { trigger: ".ab-copy", start: "top 75%", end: "bottom 50%", scrub: 0.5 } });
       gsap.fromTo(".ab-copy .st-more", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", scrollTrigger: { trigger: ".ab-copy .st-more", start: "top 92%" } });
       // ③ 걸어온 길
       qa(".ab-row").forEach((el, i) => {

@@ -10,8 +10,12 @@ export default function SmoothScroll() {
   useEffect(() => {
     let last = document.body.scrollHeight, t = 0, scrolledAt = 0;
     const onScroll = () => { scrolledAt = performance.now(); };
+    // 고정(pin) 장면을 보고 있는 중에 다시 계산하면, 장면이 잠깐 풀렸다 다시 고정되면서 깜박이고
+    // 버튼 위치가 손가락 아래에서 움직여 "자세히 보기" 탭이 빗나갑니다. (휴대폰에서 방명록 글이 몇 초 늦게 도착할 때 자주 생김)
+    // 그래서 고정 장면 밖으로 나왔을 때까지 미룹니다.
+    const inPin = () => ScrollTrigger.getAll().some((st) => st.pin && st.isActive);
     const run = () => {
-      if (performance.now() - scrolledAt < 350) { t = setTimeout(run, 200); return; }
+      if (performance.now() - scrolledAt < 350 || inPin()) { t = setTimeout(run, 400); return; }
       ScrollTrigger.refresh(); last = document.body.scrollHeight;
     };
     const ro = new ResizeObserver(() => {
