@@ -518,7 +518,7 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
     closeRef.current?.focus();
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
   }, [p, onClose]);
-  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); setAct(null); setAllShots(false); }, [index]);
+  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); actRef.current = null; setAct(null); setAllShots(false); }, [index]);
 
   const d = p?.details;
   const pos = order?.indexOf(index) ?? -1;
@@ -536,13 +536,23 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const c = p ? THEMES[index].c : "#2f8cff";
   const on = act ?? secs[0]?.[0];
 
+  // 스크롤할 때마다 계산하면 휴대폰에서 손가락 스크롤이 무거워지므로, 한 화면(프레임)에 한 번만 계산하고
+  // 보고 있는 섹션이 실제로 바뀔 때만 다시 그립니다.
+  const raf = useRef(0);
+  const actRef = useRef(null);
   const onScroll = (e) => {
-    const t = e.currentTarget, top = t.getBoundingClientRect().top;
-    prog.set(t.scrollTop / Math.max(1, t.scrollHeight - t.clientHeight));
-    let cur = null;
-    for (const [id] of secs) { const el = t.querySelector(`#pm-${id}`); if (el && el.getBoundingClientRect().top - top < 180) cur = id; }
-    setAct(cur);
+    const t = e.currentTarget;
+    if (raf.current) return;
+    raf.current = requestAnimationFrame(() => {
+      raf.current = 0;
+      const top = t.getBoundingClientRect().top;
+      prog.set(t.scrollTop / Math.max(1, t.scrollHeight - t.clientHeight));
+      let cur = null;
+      for (const [id] of secs) { const el = t.querySelector(`#pm-${id}`); if (el && el.getBoundingClientRect().top - top < 180) cur = id; }
+      if (cur !== actRef.current) { actRef.current = cur; setAct(cur); }
+    });
   };
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
   const jump = (id) => {
     const t = scroller.current, el = t?.querySelector(`#pm-${id}`);
     if (t && el) t.scrollTo({ top: el.getBoundingClientRect().top - t.getBoundingClientRect().top + t.scrollTop - (window.matchMedia("(min-width:1024px)").matches ? 20 : 76), behavior: "smooth" });
