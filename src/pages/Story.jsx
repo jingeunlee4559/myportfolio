@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaEnvelope, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef, narrow } from "../lib/gsap";
-import { STATIC_LAYOUT as reduced, onWidthResize } from "../lib/env";
+import { STATIC_LAYOUT as reduced, onWidthResize, lite } from "../lib/env";
 import { guide, guideZone } from "../lib/guide";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
@@ -71,13 +71,17 @@ export default function Story() {
   }, []);
 
   // 벽이 천천히 흐름
+  // 휴대폰 등 가벼운 기기에서는 큰 이미지 30장이 계속 움직이는 게 가장 큰 부담이라 멈춰 둡니다.
+  // 컴퓨터에서도 벽이 화면 밖에 있으면 멈춰서 다른 장면을 방해하지 않게 합니다.
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || lite) return;
     const tws = [...wall.current.querySelectorAll(".st-col")].map((col, i) => {
       const up = i % 2 === 0;
       return gsap.fromTo(col, { yPercent: up ? 0 : -50 }, { yPercent: up ? -50 : 0, duration: 46 + (i % 3) * 9, ease: "none", repeat: -1 });
     });
-    return () => tws.forEach((t) => t.kill());
+    const io = new IntersectionObserver(([e]) => tws.forEach((t) => (e.isIntersecting ? t.resume() : t.pause())));
+    io.observe(wall.current);
+    return () => { io.disconnect(); tws.forEach((t) => t.kill()); };
   }, []);
 
   // 스크롤 연출
@@ -149,7 +153,8 @@ export default function Story() {
       const scr = gsap.utils.toArray(".st-scr");
       STEP_AT.forEach((at, k) => {
         tl.fromTo(scr[k + 1], { clipPath: "inset(100% 0% 0% 0%)", scale: 1.12, opacity: 1 }, { clipPath: "inset(0% 0% 0% 0%)", scale: 1, opacity: 1, duration: 0.05, ease: "power2.out", immediateRender: false }, at)
-          .fromTo(scr[k], { scale: 1, filter: "brightness(1)" }, { scale: 0.94, filter: "brightness(0.55)", duration: 0.05, immediateRender: false }, at);
+          // 앞 화면 어둡게(filter)는 휴대폰에서 노트북 화면이 하얗게 깜박이는 원인이라, 가벼운 기기에서는 작아지기만 합니다.
+          .fromTo(scr[k], lite ? { scale: 1 } : { scale: 1, filter: "brightness(1)" }, lite ? { scale: 0.94, duration: 0.05, immediateRender: false } : { scale: 0.94, filter: "brightness(0.55)", duration: 0.05, immediateRender: false }, at);
       });
       // 뒤에 깔린 큰 프로젝트 이름
       tl.fromTo(".st-bgw", { opacity: 0, xPercent: 10 }, { opacity: 1, xPercent: -10, duration: 0.2, immediateRender: false }, 0.34)
@@ -161,7 +166,7 @@ export default function Story() {
       return () => window.removeEventListener("resize", onResize);
     }, sec);
     // 메뉴의 "프로젝트"·히어로 버튼 → 첫 프로젝트 설명이 다 보이는 지점으로
-    const go = () => { const st = stRef.current; if (!st) return; const y = st.start + (st.end - st.start) * (STEP_AT[0] - 0.02); lenisRef.current ? lenisRef.current.scrollTo(y, { duration: 1.6 }) : window.scrollTo({ top: y, behavior: "smooth" }); };
+    const go = () => { const st = stRef.current; if (!st) return; const y = st.start + (st.end - st.start) * (STEP_AT[0] - 0.02); lenisRef.current ? lenisRef.current.scrollTo(y, { duration: lite ? 0.8 : 1.6 }) : window.scrollTo({ top: y, behavior: "smooth" }); };
     window.addEventListener("goto-project", go);
     return () => { window.removeEventListener("goto-project", go); ctx.revert(); };
   }, []);

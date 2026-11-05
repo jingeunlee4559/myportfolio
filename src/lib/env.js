@@ -13,6 +13,15 @@ export const STATIC_LAYOUT = false;
 // 손가락으로 조작하는 기기(휴대폰·태블릿)인지. 이런 기기에서는 무거운 효과를 줄입니다.
 export const touch = typeof window !== "undefined" && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
+// 가벼운 연출(lite)을 쓸 기기: 손가락 조작 기기, 카톡·인스타 같은 앱 안 브라우저, 코어·메모리가 적은 기기.
+// 이런 기기에서는 화면 전체를 다시 그리게 만드는 효과(블렌드 레이어, filter 애니메이션, 끝없이 흐르는 벽)를 끕니다.
+// 스크롤 고정 연출 같은 핵심 장면은 그대로 둡니다. html에 data-lite가 붙으므로 CSS에서도 같은 조건을 씁니다.
+const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+const inApp = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
+const lowEnd = typeof navigator !== "undefined" && ((navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2);
+export const lite = touch || inApp || lowEnd;
+if (typeof document !== "undefined" && lite) document.documentElement.dataset.lite = "";
+
 // 휴대폰은 스크롤할 때 주소창이 접혔다 펴지면서 화면 높이만 바뀌고 resize가 일어납니다.
 // 그때마다 자리를 다시 계산하면 화면이 튀므로, 휴대폰에서는 "가로 폭이 바뀐 경우"에만 fn을 실행합니다.
 export function onWidthResize(fn) {

@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { gsap, narrow } from "../lib/gsap";
 import { guideZone } from "../lib/guide";
-import { STATIC_LAYOUT as reduced } from "../lib/env";
+import { STATIC_LAYOUT as reduced, lite } from "../lib/env";
 import { projects } from "../data/projects";
 import { THEMES } from "../data/themes";
 import { FEATURED } from "../data/story";
@@ -56,7 +56,8 @@ export default function Chapter({ data, flip = false, id, no = 2 }) {
       const at = hasVid ? AT : AT.slice(1);
       at.forEach((t, k) => {
         tl.fromTo(scr[k + 1], { clipPath: "inset(100% 0% 0% 0%)", scale: 1.12, opacity: 1 }, { clipPath: "inset(0% 0% 0% 0%)", scale: 1, opacity: 1, duration: 0.07, ease: "power2.out", immediateRender: false }, t)
-          .fromTo(scr[k], { scale: 1, filter: "brightness(1)" }, { scale: 0.94, filter: "brightness(0.55)", duration: 0.07, immediateRender: false }, t);
+          // 가벼운 기기에서는 어둡게(filter) 없이 작아지기만 합니다. (깜박임 방지)
+          .fromTo(scr[k], lite ? { scale: 1 } : { scale: 1, filter: "brightness(1)" }, lite ? { scale: 0.94, duration: 0.07, immediateRender: false } : { scale: 0.94, filter: "brightness(0.55)", duration: 0.07, immediateRender: false }, t);
       });
       tl.to({}, { duration: 0.08 }, 0.92);
       // 마우스를 따라 노트북이 살짝 기울어짐 (마우스일 때만)

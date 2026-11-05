@@ -1,40 +1,56 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FaGithub, FaEnvelope, FaArrowRight } from "react-icons/fa6";
 import { PROFILE } from "../data/profile";
-import { lenisRef, lockScroll } from "../lib/gsap";
+import { gsap, lenisRef, lockScroll } from "../lib/gsap";
+import { lite } from "../lib/env";
 
 const EASE = [0.16, 1, 0.3, 1];
+// 메뉴 판이 열리고 닫히는 모습.
+// 컴퓨터: 버튼에서 원이 퍼지듯 열림(clip-path). 휴대폰: 원형 clip-path는 화면 전체를 매 프레임 다시 그려야 해서
+// 깜박임이 생기므로, 투명도 + 살짝 내려오기(transform)로 엽니다.
+const PANEL = lite
+  ? { initial: { opacity: 0, y: -16 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12, transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } }
+  : { initial: { clipPath: "circle(0% at calc(100% - 46px) 44px)" }, animate: { clipPath: "circle(150% at calc(100% - 46px) 44px)" }, exit: { clipPath: "circle(0% at calc(100% - 46px) 44px)", transition: { duration: 0.5, ease: [0.7, 0, 0.84, 0] } }, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] } };
+
 const DESC = { project: "대표 프로젝트 4개 · 그 밖의 프로젝트", about: "걸어온 길 · 수상", skill: "직접 써 본 기술", board: "의견 남기기" };
 
 // 휴대폰·태블릿 메뉴: 화면을 덮는 판이 위에서 둥글게 내려오고, 큰 글자 메뉴가 차례로 올라옵니다.
 // 지금 보고 있는 섹션 옆에는 파란 마침표가 찍혀 있습니다.
 export default function MobileMenu({ open, onClose, links, active }) {
+  // 누른 메뉴 항목. 메뉴가 "완전히 닫힌 뒤"에 이동하려고 잠시 기억해 둡니다.
+  const pending = useRef(null);
+
   useEffect(() => {
     if (!open) return;
     lockScroll(true);
+    // 메뉴가 덮고 있는 동안은 뒤 페이지의 GSAP 연출을 멈춰, 메뉴 애니메이션이 끊기지 않게 합니다.
+    gsap.globalTimeline.pause();
     const esc = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", esc);
-    return () => { lockScroll(false); window.removeEventListener("keydown", esc); };
+    return () => { gsap.globalTimeline.resume(); lockScroll(false); window.removeEventListener("keydown", esc); };
   }, [open, onClose]);
 
-  const go = (id) => {
-    onClose();
-    // 메뉴가 닫히고 스크롤이 풀린 다음 이동
-    setTimeout(() => {
+  const go = (id) => { pending.current = id; onClose(); };
+
+  // 닫힘 애니메이션이 끝나고 스크롤 잠금이 풀린 다음에 이동합니다. (닫히는 중에 이동이 겹치면 휴대폰에서 버벅임)
+  const afterClose = () => {
+    const id = pending.current; pending.current = null;
+    if (!id) return;
+    requestAnimationFrame(() => {
       if (id === "project") { window.dispatchEvent(new Event("goto-project")); return; }
       const el = document.getElementById(id); if (!el) return;
-      lenisRef.current ? lenisRef.current.scrollTo(el, { offset: -70, duration: 1.4 }) : el.scrollIntoView({ behavior: "smooth" });
-    }, 380);
+      const l = lenisRef.current;
+      // 휴대폰은 고정 구간 여러 개를 천천히 통과하면 무거우므로 짧게 이동합니다.
+      if (l) l.scrollTo(el, { offset: -70, duration: lite ? 0.6 : 1.4 });
+      else el.scrollIntoView({ behavior: lite ? "auto" : "smooth" });
+    });
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={afterClose}>
       {open && (
-        <motion.div key="mm" id="mobile-menu" className="mm" role="dialog" aria-modal="true" aria-label="메뉴"
-          initial={{ clipPath: "circle(0% at calc(100% - 46px) 44px)" }} animate={{ clipPath: "circle(150% at calc(100% - 46px) 44px)" }}
-          exit={{ clipPath: "circle(0% at calc(100% - 46px) 44px)", transition: { duration: 0.5, ease: [0.7, 0, 0.84, 0] } }}
-          transition={{ duration: 0.75, ease: EASE }}>
+        <motion.div key="mm" id="mobile-menu" className="mm" role="dialog" aria-modal="true" aria-label="메뉴" data-lenis-prevent {...PANEL}>
           <span className="mm-glow" aria-hidden="true" />
           <nav className="mm-in" aria-label="섹션 이동">
             <motion.p className="mm-kick" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.6, ease: EASE }}>MENU</motion.p>

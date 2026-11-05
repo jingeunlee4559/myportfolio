@@ -1527,3 +1527,26 @@ html:not(.dark) .nav-open .nav-logo, html:not(.dark) .nav-open #logoText { color
   nav.backdrop-blur-2xl.bg-white\/80 { background-color: rgb(255 255 255 / .95); }
   nav.backdrop-blur-2xl.bg-\[\#0f1730\]\/85 { background-color: rgb(15 23 48 / .96); }
 }
+
+/* =====================================================================
+   v7.2 — 가벼운 연출(lite): 휴대폰·태블릿·앱 안 브라우저(카톡 등)·저사양 기기
+   src/lib/env.js 의 lite 조건과 같으며, html[data-lite]로 켜집니다.
+   화면 전체를 매 프레임 다시 합성하게 만드는 효과를 끄면 깜박임(하얀 프레임)과 끊김이 사라집니다.
+   ===================================================================== */
+/* 화면 전체 종이 질감: 고정 레이어 + 블렌드라 스크롤할 때마다 화면 전체를 다시 섞어야 함 (투명도 3.5%라 꺼도 거의 티 안 남) */
+html[data-lite] body::after { display: none; }
+/* 큰 흐림 빛: blur(30px)를 큰 면적에 쓰면 무거움 → 흐림 없이 radial-gradient만 */
+html[data-lite] .st-glow, html[data-lite] .chp-glow { filter: none; }
+/* 인트로 오로라 빛: 흐림 반경을 줄여 첫 화면 부담을 덜기 */
+html[data-lite] .in-aur { filter: blur(40px); }
+/* 멈춘 벽은 GPU 레이어를 따로 잡아 둘 필요가 없음 (메모리 절약) */
+html[data-lite] .st-col { will-change: auto; }
+/* 모달은 손가락 스크롤이 바깥 페이지로 번지지 않게 해서, 앱 브라우저 주소창이 접혔다 펴지는 일을 줄임 */
+html[data-lite] .modal-bd, html[data-lite] .modal-bd * { overscroll-behavior: contain; }
+
+/* ---------- 휴대폰 메뉴 판 (v7.2) ----------
+   inset: 0 만 쓰면 앱 브라우저 주소창이 접혔다 펴질 때 판 높이가 한 박자 늦게 따라와 아래로 뒤 페이지가 비칩니다.
+   주소창이 접혔을 때의 가장 큰 높이(lvh)로 깔아 두면 빈틈이 생기지 않습니다. (lvh를 모르는 브라우저는 100vh 사용)
+   메뉴 안 스크롤이 바깥 페이지로 번지지 않게 막고, 판 위에서는 세로 스크롤 말고 다른 손동작(확대 등)을 받지 않습니다. */
+.mm { bottom: auto; height: 100vh; height: 100lvh; touch-action: pan-y; overscroll-behavior: none; }
+.mm-in { height: 100vh; height: 100svh; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }

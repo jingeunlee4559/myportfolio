@@ -12,8 +12,10 @@ export { gsap, ScrollTrigger };
 export const lenisRef = { current: null };
 export const lockScroll = (on) => {
   const l = lenisRef.current;
-  if (on) { l?.stop(); document.documentElement.style.overflow = "hidden"; }
-  else { l?.start(); document.documentElement.style.overflow = ""; }
+  const s = document.documentElement.style;
+  // overscroll-behavior: 휴대폰에서 잠긴 페이지를 손가락으로 당겨도 튕기거나 주소창이 접혔다 펴지지 않게 합니다.
+  if (on) { l?.stop(); s.overflow = "hidden"; s.overscrollBehavior = "none"; }
+  else { l?.start(); s.overflow = ""; s.overscrollBehavior = ""; }
 };
 
 // 휴대폰 또는 세로로 긴 태블릿이면 "좁은 화면" 배치(기기 위, 설명 아래)를 씁니다. CSS의 같은 조건과 맞춰 둡니다.
