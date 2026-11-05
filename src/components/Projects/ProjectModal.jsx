@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
+import { AnimatePresence, motion, useDragControls, useMotionValue, useSpring } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { FaArrowLeft, FaArrowRight, FaArrowsRotate, FaCalendarDays, FaChartPie, FaCheck, FaChevronDown, FaDesktop, FaGithub, FaLightbulb, FaLink, FaMagnifyingGlass, FaRobot, FaServer, FaTriangleExclamation, FaTrophy, FaUserGear, FaUsers, FaWrench } from "react-icons/fa6";
 import { projects } from "../../data/projects";
@@ -513,6 +513,10 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
   const p = index == null ? null : projects[index];
   const closeRef = useRef(null);
   const scroller = useRef(null);
+  // 휴대폰: 위쪽 바를 잡고 아래로 쓸어내리면 닫힘 (앱의 바텀시트처럼). 바 위의 버튼을 누를 때는 끌기 시작 안 함.
+  const drag = useDragControls();
+  const startDrag = (e) => { if (lite && !e.target.closest("button, a")) drag.start(e); };
+  const endDrag = (_, info) => { if (info.offset.y > 110 || info.velocity.y > 600) onClose(); };
   const prog = useMotionValue(0);
   const bar = useSpring(prog, { stiffness: 140, damping: 30 });
   const [act, setAct] = useState(null);
@@ -583,9 +587,11 @@ export default function ProjectModal({ index, onClose, onChange, order }) {
           {lite && <motion.i className="pm-dim" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />}
           <motion.div role="dialog" aria-modal="true" aria-label={d.modalTitle} style={{ "--pm-c": c, "--pm-fg": textOn(c) }} onClick={(e) => e.stopPropagation()}
             {...SHEET}
+            {...(lite ? { drag: "y", dragControls: drag, dragListener: false, dragConstraints: { top: 0, bottom: 0 }, dragElastic: { top: 0, bottom: 0.9 }, onDragEnd: endDrag } : {})}
             className="pm-root pm-shell relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-t-[32px] border border-line shadow-[0_60px_140px_-30px_rgba(20,20,60,.5)] sm:h-[min(92vh,980px)] sm:rounded-[36px]">
             {/* 상단 바 */}
-            <div className="pm-topbar relative flex shrink-0 items-center justify-between gap-3 border-b border-line px-5 py-3.5 md:px-8">
+            <div onPointerDown={startDrag} className="pm-topbar relative flex shrink-0 items-center justify-between gap-3 border-b border-line px-5 py-3.5 md:px-8">
+              {lite && <i className="pm-grab" aria-hidden="true" />}
               <motion.i style={{ scaleX: bar }} className="absolute inset-x-0 -bottom-px h-[3px] origin-left bg-gradient-to-r from-accent to-cyan" aria-hidden="true" />
               <p className="flex min-w-0 items-center gap-3 display text-xs font-semibold text-mute"><span className="shrink-0"><span className="text-accent">{String(pos + 1).padStart(2, "0")}</span> / {String(order?.length ?? 0).padStart(2, "0")}</span><span className="hidden h-3 w-px bg-line sm:block" aria-hidden="true" /><span className="hidden truncate font-sans sm:block">{d.modalTitle}</span></p>
               <div className="flex gap-2">

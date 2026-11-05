@@ -8,6 +8,7 @@ import { projects } from "../data/projects";
 import { WALL, CHAPTERS, FEATURED } from "../data/story";
 import { THEMES } from "../data/themes";
 import FloatCards from "../components/FloatCards";
+import MailLine from "../components/MailLine";
 
 // ───────────────────────────────────────────────────────────────
 // 히어로 → 노트북 속 첫 프로젝트(Talaria)까지 한 번에 이어지는 장면.
@@ -36,18 +37,6 @@ const E = gsap.parseEase("power2.inOut");
 const mix = (p, q, t) => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t, w: p.w + (q.w - p.w) * t, h: p.h + (q.h - p.h) * t });
 
 // 메일 주소 한 줄: 누르면 주소가 복사되고 "복사됨"이 잠깐 보입니다. 옆 아이콘은 메일 앱 열기.
-export function MailLine({ email }) {
-  const [done, setDone] = useState(false);
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(email); setDone(true); setTimeout(() => setDone(false), 1600); }
-    catch { window.location.href = `mailto:${email}`; }
-  };
-  return (
-    <p className="st-mail">
-      <button type="button" onClick={copy} data-cursor="복사" aria-label={`메일 주소 복사: ${email}`}><FaEnvelope aria-hidden="true" />{email}<em>{done ? "복사됨" : "복사"}</em></button>
-    </p>
-  );
-}
 
 export default function Story() {
   const wrap = useRef(null), prog = useRef(0), stepRef = useRef(-1);

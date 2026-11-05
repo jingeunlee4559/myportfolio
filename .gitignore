@@ -29,3 +29,6 @@ dist-ssr
 
 # 용량 큰 압축 파일 (GitHub 100MB 제한)
 *.zip
+
+.vercel
+.env*

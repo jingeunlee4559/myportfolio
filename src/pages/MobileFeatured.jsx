@@ -1,11 +1,11 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowRight, FaGithub } from "react-icons/fa6";
-import { gsap, lenisRef } from "../lib/gsap";
+import { gsap, scrollToTarget } from "../lib/gsap";
 import { reduced } from "../lib/env";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
 import { WALL, CHAPTERS, WEBAPP, FEATURED } from "../data/story";
-import { MailLine } from "./Story";
+import MailLine from "../components/MailLine";
 
 // ───────────────────────────────────────────────────────────────
 // 휴대폰·태블릿 전용: 히어로 + 대표 프로젝트 4개
@@ -13,30 +13,62 @@ import { MailLine } from "./Story";
 // 같은 디자인(글꼴·색·노트북 프레임·버튼)을 그대로 쓰되, 스크롤에 묶이지 않는 화면으로 따로 만들었습니다.
 //  · 히어로: 문장이 한 줄씩 올라오고 마침표가 떨어짐 (이미지 벽은 멈춘 채 배경으로)
 //  · 대표 프로젝트: 같은 형식의 카드 4장. 화면에 처음 들어올 때 한 번만 옆·아래에서 미끄러져 들어옴
+//    노트북 속 화면은 손가락으로 좌우로 넘겨 메인·기능 화면을 볼 수 있음 (브라우저 기본 scroll-snap, 스크롤 계산 없음)
 // 프로젝트 내용은 data/ 폴더의 같은 데이터를 쓰므로, 내용을 고칠 때는 한 곳만 고치면 됩니다.
 // ───────────────────────────────────────────────────────────────
 
 const openProject = (i) => window.dispatchEvent(new CustomEvent("open-project", { detail: i }));
 const COLS = 5;
 
+// 노트북 속 화면 목록: 메인 화면(있으면) → 기능 화면들
+const slidesOf = (c) => [...(c.cover ? [c.cover] : []), ...c.steps.map((s) => ({ img: s.img, title: s.title }))];
+
 // 카드 4장 (PC와 같은 순서·번호). from: 노트북 화면이 들어오는 방향
 const CARDS = [
-  { key: "talaria", idx: CHAPTERS.talaria.idx, name: CHAPTERS.talaria.name, title: CHAPTERS.talaria.title, img: CHAPTERS.talaria.steps[0].img, steps: CHAPTERS.talaria.steps, from: "l" },
+  { key: "talaria", idx: CHAPTERS.talaria.idx, name: CHAPTERS.talaria.name, title: CHAPTERS.talaria.title, slides: slidesOf(CHAPTERS.talaria), steps: CHAPTERS.talaria.steps, from: "l" },
   {
-    key: "webapp", idx: WEBAPP.idx, name: WEBAPP.label, title: [WEBAPP.title], img: WEBAPP.web.img, phone: WEBAPP.app[0].img,
+    key: "webapp", idx: WEBAPP.idx, name: WEBAPP.label, title: [WEBAPP.title], slides: [{ img: WEBAPP.web.img, title: WEBAPP.web.title }], phone: WEBAPP.app[0].img,
     steps: [{ title: WEBAPP.web.title, text: WEBAPP.web.text }, { title: WEBAPP.app[0].title, text: WEBAPP.app[0].text }], from: "lr",
   },
-  { key: "wedding", idx: CHAPTERS.wedding.idx, name: CHAPTERS.wedding.name, title: CHAPTERS.wedding.title, img: CHAPTERS.wedding.steps[0].img, steps: CHAPTERS.wedding.steps, from: "r" },
-  { key: "signal", idx: CHAPTERS.signal.idx, name: CHAPTERS.signal.name, title: CHAPTERS.signal.title, img: CHAPTERS.signal.steps[0].img, steps: CHAPTERS.signal.steps, from: "l" },
+  { key: "wedding", idx: CHAPTERS.wedding.idx, name: CHAPTERS.wedding.name, title: CHAPTERS.wedding.title, slides: slidesOf(CHAPTERS.wedding), steps: CHAPTERS.wedding.steps, from: "r" },
+  { key: "signal", idx: CHAPTERS.signal.idx, name: CHAPTERS.signal.name, title: CHAPTERS.signal.title, slides: slidesOf(CHAPTERS.signal), steps: CHAPTERS.signal.steps, from: "l" },
 ];
 
+// 노트북: 화면을 좌우로 넘길 수 있고(scroll-snap), 아래 점으로 몇 번째 화면인지 표시. 화면을 누르면 상세 창이 열림.
 function Laptop({ card, cls }) {
+  const strip = useRef(null);
+  const [cur, setCur] = useState(0);
+  const raf = useRef(0);
+  const many = card.slides.length > 1;
+  const onScroll = () => {
+    if (raf.current) return;
+    raf.current = requestAnimationFrame(() => {
+      raf.current = 0;
+      const el = strip.current; if (!el) return;
+      const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+      setCur((c) => (c === i ? c : i));
+    });
+  };
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const goTo = (i) => { const el = strip.current; if (el) el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" }); };
   return (
     <div className={`mf-lap ${cls}`}>
-      <button type="button" className="chp-lap mf-lap-btn" onClick={() => openProject(card.idx)} aria-label={`${card.name} 자세히 보기`}>
-        <span className="chp-screen"><img className="mf-img" src={card.img} alt={`${card.name} ${card.steps[0].title}`} loading="lazy" decoding="async" /></span>
-      </button>
+      <div className="chp-lap">
+        <div ref={strip} className="chp-screen mf-strip" onScroll={many ? onScroll : undefined} aria-label={many ? `${card.name} 화면 ${card.slides.length}장, 옆으로 넘겨 보기` : undefined}>
+          {card.slides.map((s, k) => (
+            <button key={k} type="button" className="mf-slide" onClick={() => openProject(card.idx)} aria-label={`${card.name} ${s.title} · 자세히 보기`}>
+              <img className="mf-img" src={s.img} alt="" loading="lazy" decoding="async" />
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="chp-base" aria-hidden="true" />
+      {many && (
+        <div className="mf-dots">
+          <span className="mf-dots-k">{card.slides[cur]?.title}</span>
+          <span className="mf-dots-i">{card.slides.map((s, k) => <button key={k} type="button" className={k === cur ? "on" : ""} onClick={() => goTo(k)} aria-label={`${k + 1}번째 화면: ${s.title}`} aria-current={k === cur} />)}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -88,8 +120,7 @@ export default function MobileFeatured() {
   useEffect(() => {
     const go = () => {
       const el = document.getElementById("featured"); if (!el) return;
-      const l = lenisRef.current;
-      if (l) l.scrollTo(el, { offset: -70, duration: 0.8 }); else el.scrollIntoView({ behavior: "smooth" });
+      scrollToTarget(el, { offset: -70, duration: 0.8 });
     };
     window.addEventListener("goto-project", go);
     return () => window.removeEventListener("goto-project", go);

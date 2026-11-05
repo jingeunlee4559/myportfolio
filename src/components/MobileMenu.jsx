@@ -1,16 +1,17 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FaArrowRight } from "react-icons/fa6";
-import { gsap, lenisRef, lockScroll } from "../lib/gsap";
+import { gsap, lockScroll, scrollToTarget } from "../lib/gsap";
 import { lite } from "../lib/env";
 
 const EASE = [0.16, 1, 0.3, 1];
 // 메뉴 판이 열리고 닫히는 모습.
 // 컴퓨터: 버튼에서 원이 퍼지듯 열림(clip-path).
 // 휴대폰: 판이 반투명해지는 순간 뒤 화면이 비쳐 보여서, 판은 바로 불투명하게 나타나고(안의 글자만 차례로 올라옴)
-//         닫을 때는 투명도 변화 없이 위로 걷혀 올라갑니다.
+//         닫을 때는 반투명 상태를 거치지 않고 한 번에 사라집니다.
 const PANEL = lite
-  ? { initial: false, animate: { y: 0 }, exit: { y: "-100%", transition: { duration: 0.3, ease: [0.4, 0, 1, 1] } } }
+  // 닫을 때: 위로 걷히며 뒤 화면이 드러나 보이던 것을 없애려고, 판은 움직이지 않고 한 번에 사라집니다.
+  ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0, transition: { duration: 0 } } }
   : { initial: { clipPath: "circle(0% at calc(100% - 46px) 44px)" }, animate: { clipPath: "circle(150% at calc(100% - 46px) 44px)" }, exit: { clipPath: "circle(0% at calc(100% - 46px) 44px)", transition: { duration: 0.5, ease: [0.7, 0, 0.84, 0] } }, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] } };
 
 const DESC = { project: "대표 프로젝트 4개 · 그 밖의 프로젝트", about: "걸어온 길 · 수상", skill: "직접 써 본 기술", board: "의견 남기기" };
@@ -55,9 +56,7 @@ export default function MobileMenu({ open, onClose, links, active }) {
     requestAnimationFrame(() => {
       if (id === "project") { window.dispatchEvent(new Event("goto-project")); return; }
       const el = document.getElementById(id); if (!el) return;
-      const l = lenisRef.current;
-      if (l) l.scrollTo(el, { offset: -70, duration: lite ? 0.6 : 1.4 });
-      else el.scrollIntoView({ behavior: lite ? "auto" : "smooth" });
+      scrollToTarget(el, { offset: lite ? -96 : -70, duration: lite ? 0.6 : 1.4 });
     });
   };
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, lenisRef } from "../lib/gsap";
+import { touch } from "../lib/env";
 
 // 관성 있는 부드러운 스크롤. GSAP 스크롤 연출과 같은 박자로 움직이도록 GSAP 시계에 연결합니다.
 // 모션 줄이기 설정이면 켜지 않습니다.
@@ -30,6 +31,9 @@ export default function SmoothScroll() {
   }, []);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // 휴대폰·태블릿은 손가락 스크롤이 원래 가장 부드러워서(Lenis도 기본적으로 터치에는 관여하지 않음) 아예 켜지 않습니다.
+    // 매 프레임 돌던 대기 작업이 없어져 조금 더 가벼워집니다. 부드러운 스크롤은 PC 마우스 휠에서만 씁니다.
+    if (touch) return;
     const lenis = new Lenis({ lerp: 0.1, anchors: { offset: -80 } });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);

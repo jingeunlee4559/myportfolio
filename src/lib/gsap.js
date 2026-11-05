@@ -36,3 +36,11 @@ export function sortTriggers() {
     return pos & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
   });
 }
+
+// 요소(또는 y 위치)로 스크롤 이동. PC는 Lenis로 부드럽게, 휴대폰은 브라우저 기본 부드러운 스크롤.
+export function scrollToTarget(target, { offset = 0, duration = 1.2 } = {}) {
+  const l = lenisRef.current;
+  if (l) { l.scrollTo(target, { offset, duration }); return; }
+  const y = typeof target === "number" ? target : target.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top: Math.max(0, y + offset), behavior: "smooth" });
+}
