@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { FaArrowRight, FaGithub } from "react-icons/fa6";
 import { gsap, lenisRef } from "../lib/gsap";
-import { guideZone } from "../lib/guide";
 import { reduced } from "../lib/env";
 import { PROFILE } from "../data/profile";
 import { projects } from "../data/projects";
@@ -44,7 +43,7 @@ function Laptop({ card, cls }) {
 
 export default function MobileFeatured() {
   const hero = useRef(null), list = useRef(null);
-  const cols = Array.from({ length: COLS }, (_, c) => Array.from({ length: 5 }, (_, k) => WALL[(c * 4 + k * 3) % WALL.length]));
+  const cols = Array.from({ length: COLS }, (_, c) => { const l = Array.from({ length: 5 }, (_, k) => WALL[(c * 4 + k * 3) % WALL.length]); return [...l, ...l]; });
 
   // 히어로 문장 등장 (인트로가 끝난 뒤 한 번)
   useLayoutEffect(() => {
@@ -63,11 +62,17 @@ export default function MobileFeatured() {
     return () => window.removeEventListener("intro-done", run);
   }, []);
 
-  // 마침표 길잡이: 히어로 마침표 → 각 카드 제목 끝 (스크롤에 묶인 계산 없이 구간만 알려 줌)
-  useLayoutEffect(() => {
-    const zs = [guideZone(hero.current, () => hero.current.querySelector(".st-dot"), { start: "top top", end: "bottom 45%", first: true })];
-    list.current.querySelectorAll(".mf-card, .mf-intro").forEach((el) => zs.push(guideZone(el, () => el.querySelector(".gd-p"))));
-    return () => zs.forEach((z) => z.kill());
+  // 이미지 벽이 천천히 흐름 (예전 히어로처럼). 휴대폰에서는 가볍게:
+  //  · 이미지 수를 줄이고(기둥 5개 × 5장), GSAP 대신 CSS 애니메이션(transform)만 사용 → 브라우저가 따로 처리해 스크롤과 부딪히지 않음
+  //  · 히어로가 화면 밖으로 나가면 멈춤 (아래 장면을 볼 때는 아무 일도 하지 않음)
+  useEffect(() => {
+    if (reduced) return;
+    const el = hero.current;
+    el.classList.add("mh-flow");
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([e]) => el.classList.toggle("mh-pause", !e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   // 카드가 화면에 처음 들어올 때 한 번만 미끄러져 들어옴 (CSS 전환 + IntersectionObserver: 스크롤 중 계산 없음)
@@ -96,7 +101,7 @@ export default function MobileFeatured() {
         <div className="st-wall">
           <div className="st-tilt" aria-hidden="true">
             <div className="st-wallin">
-              {cols.map((l, c) => <div key={c} className="st-col">{l.map((src, k) => <img key={k} src={src} alt="" loading={k < 3 ? "eager" : "lazy"} decoding="async" />)}</div>)}
+              {cols.map((l, c) => <div key={c} className="st-col" style={{ "--dur": `${46 + (c % 3) * 9}s` }}>{l.map((src, k) => <img key={k} src={src} alt="" loading={k < 3 ? "eager" : "lazy"} decoding="async" />)}</div>)}
             </div>
           </div>
           <div className="st-shade" aria-hidden="true" />

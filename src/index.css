@@ -1614,8 +1614,7 @@ html[data-lite] .ab-halo::after { animation: none; }
 .mf .st-kicker { display: block; margin-bottom: 8px; }
 .mf .st-h2 { font-size: clamp(1.5rem, 6.6vw, 2rem); margin-top: 10px; }
 .mf .st-steps { gap: 12px; margin-top: 18px; }
-.mf .st-steps li { color: var(--color-ink); border-color: var(--st-line); }
-.mf .st-steps li:first-child { border-color: var(--color-accent); }
+.mf .st-steps li { color: var(--color-ink); border-color: var(--color-accent); } /* 3줄을 한 번에 보여 주므로 모두 파란 선 */
 .mf .st-steps li b { font-size: 15.5px; }
 .mf .st-steps li span { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.6; color: var(--st-sub); }
 .mf .st-more { height: 46px; margin-top: 22px; }
@@ -1655,3 +1654,14 @@ html[data-lite] .modal-bd.pm-lite { background-color: transparent !important; }
 html.dark .pm-dim { background: rgb(2 6 16 / .82); }
 .mf-lap .chp-screen { display: block; }
 .mf-lap-btn { color: inherit; text-align: left; }
+
+/* ---------- v8: 휴대폰 히어로 이미지 벽 흐르기 (CSS 애니메이션, 화면 밖이면 멈춤) ----------
+   기둥마다 같은 이미지 목록을 두 번 이어 붙여 두고, 절반(-50%)만큼 움직인 뒤 처음으로 돌아가 끊김 없이 이어집니다.
+   아래 여백(padding-bottom)을 사이 간격(gap)과 같게 두어 절반 지점이 정확히 맞도록 합니다. */
+@keyframes mhUp { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, -50%, 0); } }
+@keyframes mhDown { from { transform: translate3d(0, -50%, 0); } to { transform: translate3d(0, 0, 0); } }
+.mh .st-col { gap: 14px; padding-bottom: 14px; }
+html[data-lite] .mh-flow .st-col { animation: mhUp var(--dur, 50s) linear infinite; will-change: transform; }
+html[data-lite] .mh-flow .st-col:nth-child(even) { animation-name: mhDown; }
+html[data-lite] .mh-pause .st-col { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { html[data-lite] .mh-flow .st-col { animation: none; } }

@@ -1,7 +1,13 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "../lib/gsap";
 import { guide } from "../lib/guide";
-import { reduced, touch } from "../lib/env";
+import { reduced, touch, lite } from "../lib/env";
+
+// 휴대폰·태블릿(lite)에서는 따라다니는 점을 쓰지 않습니다. 화면이 좁아 글자와 겹치거나 산만해 보이고,
+// 매 프레임 위치를 읽는 일이 카톡 같은 느린 브라우저에 부담이라서입니다.
+// 대신 각 제목 끝 자리(.gd-p)에 파란 마침표가 그대로 찍히고, 걸어온 길은 지금 단계의 동그라미가 직접 켜집니다.
+// (html에 gd-live가 없을 때의 모습은 index.css에 이미 준비되어 있음)
+const OFF = reduced || lite;
 
 // 마침표 길잡이를 그리는 층: 파란 점 하나 + 지나간 자리에 남는 짧은 빛 꼬리.
 // 각 장면이 정해 준 "마침표 자리"(요소)의 실제 위치를 매 프레임 읽어 부드럽게 따라갑니다.
@@ -12,7 +18,7 @@ const COLORS = { base: [47, 140, 255], alert: [230, 45, 45], light: [255, 255, 2
 export default function Guide() {
   const dot = useRef(null), cv = useRef(null);
   useEffect(() => {
-    if (reduced) return;
+    if (OFF) return;
     document.documentElement.classList.add("gd-live");
     const c = cv.current, g = c.getContext("2d");
     let W = 0, H = 0, DPR = 1;
@@ -85,7 +91,7 @@ export default function Guide() {
     gsap.ticker.add(tick);
     return () => { gsap.ticker.remove(tick); removeEventListener("resize", size); window.removeEventListener("intro-done", onIntro); document.documentElement.classList.remove("gd-live"); };
   }, []);
-  if (reduced) return null;
+  if (OFF) return null;
   return (
     <>
       <canvas ref={cv} className="gd-trail" aria-hidden="true" />
